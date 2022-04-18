@@ -1,0 +1,37 @@
+{
+    "general": {
+        
+    },
+    "login": {
+        "name": "Tên",
+        "email": "Email",
+        "password": "Password",
+        "forgot_password": "Forgot Password?",
+        "or_signIn_with": "Hoặc tiếp tục bằng",
+        "login": "Đăng nhập",
+        "register": "Đăng kí",
+        "title_login": "Đăng nhập tài khoản",
+        "title_register": "Đăng kí tài khoản",
+        "reset_password": "Reset Password",
+        "password_reset_successfully": "Password Reset Successfully",
+        "enter_name": "Nhập tên",
+        "enter_email": "Nhập email",
+        "enter_password": "Nhập password",
+        "retype_password": "Nhập lại Password",
+        "login_placeholder": "mail@example.com",
+        "btn_register": "Đăng kí",
+        "accept_with_policie": "Tôi đồng ý với các điều khoản & quy định.",
+        "have_account": "Bạn đã có tài khoản?"
+    },
+    "validation": {
+        "required": "Field is required",
+        "email_incorrect": "Incorrect Email.",
+        "email_already_taken": "The email has already been taken.",
+        "email_does_not_exist": "User with given email doesn't exist",
+        "password_min_length": "Password must contain {count} characters",
+        "name_min_length": "Name must have at least {count} letters.",
+        "password_incorrect": "Passwords must be identical",
+        "password_length": "Password must be {count} character long."
+    }
+
+}
