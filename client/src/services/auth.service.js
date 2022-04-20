@@ -5,12 +5,12 @@ class AuthService {
     login(user) {
         return axios
         .post(API_URL + 'login', {
-            username: user.username,
+            email: user.email,
             password: user.password
         })
         .then(response => {
-            if(response.status == 1 && response.data.access_token) {
-                localStorage.setItem('user', JSON.stringify(response.data));
+            if(response.data.status == 1 && response.data.results.access_token) {
+                localStorage.setItem('user', JSON.stringify(response.data.results.access_token));
             }
             return response.data
         });
@@ -28,12 +28,27 @@ class AuthService {
         })
         .then(response => {
             if(response.data.status == 1 && response.data.results.token) {
-                localStorage.setItem('user', JSON.stringify(response.data));
+                // localStorage.setItem('user', JSON.stringify(response.data));
             }
             return response.data
         })
         .catch(error => {
             return JSON.stringify(error);
+        })
+    }
+
+    me() {
+        // let user = localStorage.getItem('user')
+        return axios.get(API_URL + 'me', {
+            // headers: {
+            //     Authorization: 'Bearer ' + JSON.parse(user).access_token //the token is a variable which holds the token
+            // }
+        })
+        .then(response => {
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(err)
         })
     }
 }

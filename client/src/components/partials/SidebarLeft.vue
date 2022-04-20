@@ -34,7 +34,7 @@
                     
                     <Tab>
                         <div class="w-full cursor-pointer">
-                            <CogIcon class="w-8 h-8 m-auto text-gray-500" />
+                            <CogIcon class="w-8 h-8 m-auto text-gray-500" @click="setLogout" />
                         </div>
                     </Tab>
                 </div>
@@ -175,10 +175,17 @@ export default {
     methods: {
         ...mapActions(['SET_DARKMODE']),
 
+        ...mapActions('auth', ['logout']),
+
         toggleDarkMode() {
             this.isDark = !this.isDark
             this.SET_DARKMODE(this.isDark)
-        }
+        },
+        
+        setLogout() {
+            this.logout()
+            this.$router.push("/login");
+        },
     }
 }
 </script>

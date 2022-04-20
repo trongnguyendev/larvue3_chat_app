@@ -74,14 +74,12 @@
 <script>
 import { UserIcon, KeyIcon, MailIcon } from '@heroicons/vue/solid'
 import { mapActions, mapState } from 'vuex'
-
 import useVuelidate from '@vuelidate/core'
 import { required, email, shouldBeChecked, sameAs, helpers } from '@vuelidate/validators'
-
 import { useToast } from "vue-toastification";
 
 export default {
-     setup () {
+    setup () {
         const toast = useToast();
         return { v$: useVuelidate(), toast }
     },
@@ -128,7 +126,7 @@ export default {
             'register',
         ]),
 
-        async submitForm(user) 
+        async submitForm() 
         {
             const isFormCorrect = await this.v$.$validate()
 
@@ -152,8 +150,9 @@ export default {
                 this.registerFail = false
                 this.emailTaken = false
                 this.toast.success("Register success");
-                v$.$reset()
                 this.$router.push("/login");
+                v$.$reset()
+                
             }
         }
     }

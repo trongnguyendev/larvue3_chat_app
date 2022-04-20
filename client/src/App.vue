@@ -26,8 +26,13 @@ import SidebarRight from './components/partials/SidebarRight.vue'
 import SidebarLeft from './components/partials/SidebarLeft.vue'
 
 import { mapState, mapGetters, mapActions } from 'vuex'
+import { useToast } from "vue-toastification";
 
 export default {
+  setup () {
+      const toast = useToast();
+      return { toast }
+  },
   name: 'App',
   components: {
     PhoneIcon,
@@ -68,11 +73,7 @@ export default {
       ],
     }
   },
-
-  created() {
-    // watch change router
-  },
-
+  
   filters: {
       truncate: function(value) {
         if (value && value.length > 5) {
@@ -85,22 +86,36 @@ export default {
   computed: {
     ...mapGetters([
       'darkMode'
+    ]),
+
+    ...mapState('notification', [
+      'active',
+      'title',
+      'message',
+      'type'
     ])
   },
-  
 
   methods: {
+    ...mapActions('notification', [
+      'resetNotification'
+    ])
   },
 
   watch: {
     darkMode() {
       this.isDark = this.darkMode
+    },
+    active() {
+      if(this.active) {
+        if(this.type == 'success') {
+          this.toast.success(this.title);
+        } else {
+          this.toast.error(this.title);
+        }
+        this.resetNotification()
+      }
     }
   },
-
-  mounted() {
-    // this.isDark = localStorage.getItem('themeDark');
-    
-  }
 }
 </script>

@@ -20,6 +20,7 @@
         "retype_password": "Nhập lại Password",
         "login_placeholder": "mail@example.com",
         "btn_register": "Đăng kí",
+        "btn_login": "Đăng nhập",
         "accept_with_policie": "Tôi đồng ý với các điều khoản & quy định.",
         "have_account": "Bạn đã có tài khoản?"
     },

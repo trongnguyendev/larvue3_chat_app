@@ -1,15 +1,15 @@
 import AuthService from '@/services/auth.service';
-const user = JSON.parse(localStorage.getItem('user'));
+const isToken = JSON.parse(localStorage.getItem('user'));
 
-const initialState = user ? 
+const initialState = isToken ? 
 {
-    status: { loggedIn: true },
-    user
+    token: isToken,
+    loggedIn: true
 } 
 : 
 {
-    status: { loggedIn: false },
-    user: null
+    token: null,
+    loggedIn: false
 }
 
 export default {
@@ -21,56 +21,71 @@ export default {
     },
 
     mutations: {
-        loginSuccess(state, user) {
-            state.status.loggedIn = user;
-            state.user = user
+        ['AUTH_SUCCESS'](state, token) {
+            state.token = token
+            state.loggedIn = true
+        } ,
+
+        ['SET_LOGOUT'](state) {
+            state.token = null
+            state.loggedIn = false
         },
-        loginFailure(state) {
-            state.status.loggedIn = false;
-            state.user = null
+
+        ['AUTH_ERROR'](state) {
+            state.token = null
+            state.loggedIn = false
         },
-        logout(state) {
-            state.status.loggedIn = false;
-            state.user = null;
-        },
-        registerSuccess(state) {
-            state.status.loggedIn = false;
-        },
-        registerFailure(state) {
-            state.status.loggedIn = false;
+
+        ['REFRESH_TOKEN'](state, token) {
+            state.token = token
         }
     },
 
     actions: {
         login({ commit }, user) {
-            return AuthService.login(user).then(
-              user => {
-                commit('logginSuccess', user);
-                return Promise.resolve(user);
-              },
-              error => {
-                commit('loginFailure');
-                return Promise.reject(error);
-              }
-            )
+            return new Promise((resolve, reject) => {
+                AuthService.login(user)
+                .then((response) => {
+                    if(response.status == 1) {
+                        commit('AUTH_SUCCESS', response.results.access_token)
+                    } else {
+                        commit('AUTH_ERROR')
+                    }
+                    resolve(response)
+                })
+                .catch((err) => {
+                    commit('AUTH_ERROR')
+                    reject(err)
+                })
+            })
         },
 
         logout({ commit }) {
             AuthService.logout();
-            commit('logout');
+            commit('SET_LOGOUT');
         },
 
         register({ commit }, user) {
             return new Promise((resolve, reject) => {
               AuthService.register(user)
               .then((response) => {
-                commit('registerSuccess');
                 resolve(response)
               })
               .catch((err) => {
-                commit('registerFailure');
                 reject(err)
               })
+            })
+        },
+
+        me({ commit }) {
+            return new Promise((resolve, reject) => {
+                AuthService.me()
+                .then((response) => {
+                    resolve(response)
+                })
+                .catch((err) => {
+                    reject (err)
+                })
             })
         }
     }

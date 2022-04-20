@@ -116,11 +116,8 @@ import SidebarLeft from '@/components/partials/SidebarLeft.vue'
 
 import EmojiPicker from '@/components/EmojiPicker.vue'
 
-import { mapState, mapGetters, mapActions } from 'vuex'
-
 import { PhotographIcon, SearchIcon, PhoneIcon, VideoCameraIcon, InformationCircleIcon } from '@heroicons/vue/outline'
 import { EmojiHappyIcon } from '@heroicons/vue/solid'
-
 
 export default {
   name: 'App',
@@ -188,5 +185,9 @@ export default {
           return value
       }
   },
+
+  methods: {
+    
+  }
 }
 </script>

@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
 
-const axios = require('axios');
+// const axios = require('axios')
+
+import axios from 'axios'
 
 import App from './App.vue'
 
@@ -59,6 +61,21 @@ app.component('InputCheckbox', InputCheckbox)
 app.component('InputRadio', InputRadio)
 app.component('InputRadioGroup', InputRadioGroup)
 
-
 // Other config global (ex: this.configToast)
 app.config.globalProperties.configToast = []
+
+
+axios.interceptors.request.use(request => {
+    let user = localStorage.getItem('user')
+    let token = JSON.parse(user);
+
+    if(user) {
+        request.headers.common.Authorization = `Bearer ${token.access_token}`;
+    }
+
+    return request
+})
+
+axios.interceptors.response.use(response => {
+    return response
+})
