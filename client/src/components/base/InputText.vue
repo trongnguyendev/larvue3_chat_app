@@ -13,6 +13,7 @@
 <script>
 export default {
     props: ['modelValue', 'isError', 'placeHolder'],
-    emits: ['update:modelValue']
+    emits: ['update:modelValue'],
+    
 }
 </script>

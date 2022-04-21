@@ -17,7 +17,9 @@ export default {
     state: initialState,
 
     getters: {
-        
+        isLoggedIn(state) {
+            return state.loggedIn
+        }
     },
 
     mutations: {

@@ -37,7 +37,8 @@ const routes = [
     {
         path: '/message',
         name: 'chat',
-        component: Chat
+        component: Chat,
+        meta: { requiresAuth: true }
     },
 
 

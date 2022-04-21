@@ -22,7 +22,7 @@
                 <ErrorMessage v-if="v$.password.$error">Password field has an error.</ErrorMessage>
 
                 <label class="flex items-center mb-3">
-                    <input type="checkbox" class="checkbox checkbox-xs">
+                    <input type="checkbox" class="checkbox checkbox-xs" v-model="isRemember">
                     <span class="ml-2 cursor-pointer opacity-50 text-sm">Ghi nhớ đăng nhập</span>
                 </label>
 
@@ -71,10 +71,11 @@ export default {
 
     data() {
         return {
-            email: 'trongnguyendev1@gmail.com',
-            password: '123123123',
+            email: '',
+            password: '',
 
             isRequestOngoing: false,
+            isRemember: false
         }
     },
     validations () {
@@ -94,6 +95,10 @@ export default {
         })
     },
 
+    created() {
+        this.loadRemember()
+    },
+
     methods: {
         ...mapActions('auth',[
             'login',
@@ -106,6 +111,33 @@ export default {
             'showNotification',
             'resetNotification'
         ]),
+
+        loadRemember() {
+            if(this.$cookies.get('loginRemember') != null) {
+                let data_cookie = this.$cookies.get('loginRemember')
+                this.email = data_cookie.email
+                this.password = this.deCodePassword(data_cookie.password)
+                this.isRemember = true
+            }
+        },
+
+        enCodePassword(pw) {
+            return btoa(encodeURIComponent(pw))
+        },
+
+        deCodePassword(pw) {
+            return decodeURIComponent(atob(pw))
+        },
+
+        saveRemember() {
+            if(this.isRemember) {
+                this.$cookies.set('loginRemember', JSON.stringify({email: this.email, password: this.enCodePassword(this.password)}));
+            } else {
+                if(this.$cookies.get('loginRemember') != null) {
+                    this.$cookies.remove('loginRemember')
+                }
+            }
+        },
 
         async submitForm() 
         {
@@ -131,7 +163,8 @@ export default {
 
                 this.showNotification(data_notification)
             } else {
-                // this.toast.success("Login success");
+
+                this.saveRemember()
 
                 let data_notification = {
                     'title': 'Login success',
