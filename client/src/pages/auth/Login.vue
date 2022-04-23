@@ -4,35 +4,46 @@
             <h2 class="text-[24px] font-bold text-color-t">Xin chào,</h2>
             <div class="form-register grid gap-3">
                 <h1 class="text-s-17 mb-5 text-color-t">{{ $t('login.title_login') }}</h1>
+                <form action="" class="grid gap-3" @submit.prevent="submitForm">
+                    <InputText 
+                        v-model="email"
+                        :isError="v$.email.$error"
+                        :placeHolder="$t('login.enter_email')">
+                        <UserIcon class="w-5 h-5 text-gray-500 mr-1" />
+                    </InputText>
+                    <ErrorMessage v-if="v$.email.$error">Mail field has an error.</ErrorMessage>
 
-                <InputText 
-                    v-model="email"
-                    :isError="v$.email.$error"
-                    :placeHolder="$t('login.enter_email')">
-                    <UserIcon class="w-5 h-5 text-gray-500 mr-1" />
-                </InputText>
-                <ErrorMessage v-if="v$.email.$error">Mail field has an error.</ErrorMessage>
+                    <InputText
+                        v-model="password" 
+                        type="password"
+                        :isError="v$.password.$error"
+                        :placeHolder="$t('login.enter_password')">
+                        <KeyIcon class="w-5 h-5 text-gray-500 mr-1" />
+                    </InputText>
+                    <ErrorMessage v-if="v$.password.$error">Password field has an error.</ErrorMessage>
 
-                <InputText
-                    v-model="password" 
-                    :isError="v$.password.$error"
-                    :placeHolder="$t('login.enter_password')">
-                    <KeyIcon class="w-5 h-5 text-gray-500 mr-1" />
-                </InputText>
-                <ErrorMessage v-if="v$.password.$error">Password field has an error.</ErrorMessage>
+                    <div class="flex justify-between">
+                        <label class="flex items-center mb-3">
+                            <input type="checkbox" class="checkbox checkbox-xs" v-model="isRemember">
+                            <span class="ml-2 cursor-pointer opacity-50 text-sm">Ghi nhớ đăng nhập</span>
+                        </label>
 
-                <label class="flex items-center mb-3">
-                    <input type="checkbox" class="checkbox checkbox-xs" v-model="isRemember">
-                    <span class="ml-2 cursor-pointer opacity-50 text-sm">Ghi nhớ đăng nhập</span>
-                </label>
+                        <router-link
+                        class="text-sm text-blue-700 opacity-50 cursor-pointer"
+                        to="/forgot-password"
+                        >
+                            Forgot Passwords
+                        </router-link>
+                    </div>
 
-                <button class="mt-3 bg-primary rounded-md text-14 text-white w-full py-3 font-bold flex justify-center items-center" :disabled="isRequestOngoing" @click="submitForm">
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" v-if="isRequestOngoing">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    {{ $t('login.btn_login') }}
-                </button>
+                    <button class="mt-3 bg-primary rounded-md text-14 text-white w-full py-3 font-bold flex justify-center items-center" :disabled="isRequestOngoing">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" v-if="isRequestOngoing">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ $t('login.btn_login') }}
+                    </button>
+                </form>
             </div>
             <div class="mt-2 text-center">
                 <router-link to="/register" class="text-sm opacity-50 text-center">Bạn chưa có tài khoản? <span class="text-blue-700 cursor-pointer">Đăng kí ngay</span></router-link>

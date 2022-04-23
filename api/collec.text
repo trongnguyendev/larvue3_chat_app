@@ -1,0 +1,9 @@
+publish template notification template
+php artisan vendor:publish --tag=laravel-notifications
+
+publish HTML mail
+php artisan vendor:publish --tag=laravel-mail
+
+clear cache
+php artisan optimize:clear
+

@@ -14,9 +14,9 @@ trait ApiResponse
             $result['message'] = $message;
         }
 
-        if(empty($data)) {
-            $result['message'] = 'Not data';
-        }
+        // if(empty($data)) {
+        //     $result['message'] = 'Not data';
+        // }
 
         $result['results'] = $data;
 

@@ -5,52 +5,54 @@
                     <h2 class="text-[24px] font-bold text-color-t">Xin chào,</h2>
                     <div class="form-register grid gap-3">
                         <h1 class="text-s-14 mb-5 text-color-t">{{ $t('login.title_register') }}</h1>
-                        <InputText 
-                            v-model="name" 
-                            :isError="v$.name.$error"
-                            :placeHolder="$t('login.enter_name')">
-                            <UserIcon class="w-5 h-5 text-gray-500 mr-1" />
-                        </InputText>
-                        <ErrorMessage v-if="v$.name.$error">Name field has an error.</ErrorMessage>
+                        <form action="" class="grid gap-3" @submit.prevent="submitForm">
+                            <InputText 
+                                v-model="name" 
+                                :isError="v$.name.$error"
+                                :placeHolder="$t('login.enter_name')">
+                                <UserIcon class="w-5 h-5 text-gray-500 mr-1" />
+                            </InputText>
+                            <ErrorMessage v-if="v$.name.$error">Name field has an error.</ErrorMessage>
 
-                        <InputText 
-                            v-model="email"
-                            :isError="v$.email.$error || emailTaken"
-                            :placeHolder="$t('login.enter_email')">
-                            <UserIcon class="w-5 h-5 text-gray-500 mr-1" />
-                        </InputText>
-                        <ErrorMessage v-if="v$.email.$error">Mail field has an error.</ErrorMessage>
-                        <ErrorMessage v-if="emailTaken">Mail is taken.</ErrorMessage>
+                            <InputText 
+                                v-model="email"
+                                :isError="v$.email.$error || emailTaken"
+                                :placeHolder="$t('login.enter_email')">
+                                <UserIcon class="w-5 h-5 text-gray-500 mr-1" />
+                            </InputText>
+                            <ErrorMessage v-if="v$.email.$error">Mail field has an error.</ErrorMessage>
+                            <ErrorMessage v-if="emailTaken">Mail is taken.</ErrorMessage>
 
-                        <InputText
-                            v-model="password" 
-                            :isError="v$.password.$error"
-                            :placeHolder="$t('login.enter_password')">
-                            <KeyIcon class="w-5 h-5 text-gray-500 mr-1" />
-                        </InputText>
-                        <ErrorMessage v-if="v$.password.$error">Password field has an error.</ErrorMessage>
+                            <InputText
+                                v-model="password" 
+                                :isError="v$.password.$error"
+                                :placeHolder="$t('login.enter_password')">
+                                <KeyIcon class="w-5 h-5 text-gray-500 mr-1" />
+                            </InputText>
+                            <ErrorMessage v-if="v$.password.$error">Password field has an error.</ErrorMessage>
 
-                        <InputText 
-                            v-model="confirmPassword" 
-                            :isError="v$.confirmPassword.$error"
-                            :placeHolder="$t('login.retype_password')">
-                            <KeyIcon class="w-5 h-5 text-gray-500 mr-1" />
-                        </InputText>
-                        <ErrorMessage v-if="v$.confirmPassword.$error">Confirm password fail, try input password.</ErrorMessage>
+                            <InputText 
+                                v-model="confirmPassword" 
+                                :isError="v$.confirmPassword.$error"
+                                :placeHolder="$t('login.retype_password')">
+                                <KeyIcon class="w-5 h-5 text-gray-500 mr-1" />
+                            </InputText>
+                            <ErrorMessage v-if="v$.confirmPassword.$error">Confirm password fail, try input password.</ErrorMessage>
 
-                        <InputCheckbox v-model="accept">{{ $t('login.accept_with_policie')}}</InputCheckbox>
+                            <InputCheckbox v-model="accept">{{ $t('login.accept_with_policie')}}</InputCheckbox>
 
-                        <ErrorMessage v-if="v$.accept.$error">Accept field has an error.</ErrorMessage>
+                            <ErrorMessage v-if="v$.accept.$error">Accept field has an error.</ErrorMessage>
 
-                        <ErrorMessage v-if="registerFail">Register fail, please check input.</ErrorMessage>
+                            <ErrorMessage v-if="registerFail">Register fail, please check input.</ErrorMessage>
 
-                        <button class="mt-3 bg-primary rounded-md text-14 text-white w-full py-3 font-bold flex justify-center items-center" :disabled="isRequestOngoing" @click="submitForm">
-                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" v-if="isRequestOngoing">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            {{ $t('login.btn_register') }}
-                        </button>
+                            <button class="mt-3 bg-primary rounded-md text-14 text-white w-full py-3 font-bold flex justify-center items-center" :disabled="isRequestOngoing">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" v-if="isRequestOngoing">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{ $t('login.btn_register') }}
+                            </button>
+                        </form>
                     </div>
 
                     <div class="mt-2 text-center">

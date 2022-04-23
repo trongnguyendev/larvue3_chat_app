@@ -79,6 +79,31 @@ export default {
             })
         },
 
+        forgotPassword({ commit }, email) {
+            return new Promise((resolve, reject) => {
+                AuthService.forgotPassword(email)
+                .then((response) => {
+                    resolve(response)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+            })
+        },
+
+        resetPassword({ commit }, data) {
+            return new Promise((resolve, reject) => {
+                AuthService.resetPassword(data)
+                .then((response) => {
+                    resolve(response)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+            })
+        },
+        
+
         me({ commit }) {
             return new Promise((resolve, reject) => {
                 AuthService.me()

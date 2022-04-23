@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\PasswordReset;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset as PasswordResetEvent;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'check_mail', 'reset_password', 'forgotPassword', 'resetPassword', 'updatePassword']]);
     }
 
     /**
@@ -108,10 +113,100 @@ class AuthController extends Controller
         ];
 
         return $this->response_json(1, 'login success', $data);
-        // return response()->json([
-        //     'access_token' => $token,
-        //     'token_type' => 'bearer',
-        //     'expires_in' => auth()->factory()->getTTL() * 60
-        // ]);
+    }
+
+    public function check_mail(Request $request) {
+
+        $emailReset = User::where('email', $request->email)->first();
+
+        if($emailReset) {
+
+            $data = [
+                'user'       => $emailReset,
+                'token_type' => 'bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ];
+
+            return $this->response_json(1, 'check mail success', $data);
+
+        }
+        else {
+            
+            return $this->response_json(0, 'check mail fail');
+
+        }
+    }
+
+    public function reset_password(Request $request) {
+
+        $user = User::where('email', $request->email)->first();
+
+        if($user) {
+
+            $update_password = $user->update(['password' => bcrypt($request->new_password)]);
+
+            if($update_password) {
+
+                return $this->response_json(1, 'update password success');
+
+            }
+
+            return $this->response_json(0, 'update password fail');
+            
+        }
+        else {
+
+            return $this->response_json(0, 'update password fail');
+
+        }
+
+    }
+
+
+    public function forgotPassword(Request $request) {
+        // $request->validate(['email' => 'required|email']);
+    
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+    
+        return $status === Password::RESET_LINK_SENT
+                    ? $this->response_json(1, 'We have e-mailed your password reset link!', $status)
+                    : $this->response_json(0, 'sent mail resset fail', $status);
+    }
+
+    public function resetPassword(Request $request, $token) {
+        var_dump($token);
+        var_dump($request->all());
+        die();    
+    }
+
+    public function updatePassword(Request $request) {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+     
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+     
+                $user->save();
+     
+                event(new PasswordResetEvent($user));
+            }
+        );
+
+        if($status === Password::PASSWORD_RESET) {
+            PasswordReset::where('token', $request->token)->delete();
+            return $this->response_json(1, 'Password reset success.', $status);
+        }
+        else {
+            $this->response_json(0, 'Password reset fail', $status);
+        }
     }
 }

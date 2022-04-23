@@ -80,7 +80,7 @@ app.component('InputRadioGroup', InputRadioGroup)
 
 // check Authentication global router
 router.beforeEach(async (to, from, next) => {
-    const publicPages = ['login', 'register'];
+    const publicPages = ['login', 'register', 'forgotPassword', 'resetPassword'];
     const authRequired = publicPages.includes(to.name);
     const loggedIn = store.getters['auth/isLoggedIn'];
 

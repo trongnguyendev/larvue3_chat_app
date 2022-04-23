@@ -1,5 +1,6 @@
 import axios from 'axios';
 const API_URL = 'http://localhost:88/api/auth/';
+const API_URL_NOT_AUTH = 'http://localhost:88/api/';
 
 class AuthService {
     login(user) {
@@ -37,6 +38,27 @@ class AuthService {
         })
     }
 
+    forgotPassword(email) {
+        return axios.post(API_URL_NOT_AUTH + 'forgot-password', {
+            email: email
+        })
+        .then(response => {
+            return response.data
+        })
+    }
+
+    resetPassword(data) {
+        return axios.post(API_URL_NOT_AUTH + 'reset-password', {
+            email: data.email,
+            password: data.password,
+            password_confirmation: data.password_confirmation,
+            token: data.token
+        })
+        .then(response => {
+            return response.data
+        })
+    }
+    
     me() {
         // let user = localStorage.getItem('user')
         return axios.get(API_URL + 'me', {
@@ -51,6 +73,10 @@ class AuthService {
             console.log(err)
         })
     }
+
+
+
+
 }
 
 export default new AuthService();

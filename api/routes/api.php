@@ -34,3 +34,12 @@ Route::group([
     Route::get('me', [AuthController::class, 'me']);
     
 });
+
+// change password without mail
+Route::post('check_mail', [AuthController::class, 'check_mail']);
+Route::post('reset_password', [AuthController::class, 'reset_password']);
+
+// change password with mail
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'resetPassword'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'updatePassword'])->name('password.update');

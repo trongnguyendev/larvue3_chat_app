@@ -12,6 +12,8 @@ import NotFound from '@/pages/error/NotFound'
 import Auth from '@/components/layout/Auth'
 import Login from '@/pages/auth/Login'
 import Register from '@/pages/auth/Register'
+import ForgotPassword from '@/pages/auth/ForgotPassword'
+import ResetPassword from '@/pages/auth/ResetPassword'
 
 import Chat from '@/components/layout/Chat'
 
@@ -31,6 +33,16 @@ const routes = [
                 path: '/register',
                 name: 'register',
                 component: Register
+            },
+            {
+                path: '/forgot-password',
+                name: 'forgotPassword',
+                component: ForgotPassword
+            },
+            {
+                path: '/reset-password',
+                name: 'resetPassword',
+                component: ResetPassword
             }
         ]
     },
@@ -40,42 +52,6 @@ const routes = [
         component: Chat,
         meta: { requiresAuth: true }
     },
-
-
-    // { 
-    //     path: '/',
-    //     name: "home",
-    //     component: Home
-    // },
-    // {
-    //     path: '/about',
-    //     name: "about",
-    //     component: About
-    // },
-    // (\\d+)?: prex fortmat number
-    // {
-    //     path: '/products',
-    //     name: 'products',
-    //     component: ProductList,
-    //     children: [
-    //         {
-    //             path: 'phone',
-    //             name: 'productPhone',
-    //             component: ProductItemPhone
-    //         },
-    //         {
-    //             path: 'tv',
-    //             name: 'productTv',
-    //             component: ProductItemTv
-    //         }
-    //     ]
-    // },
-
-    // {
-    //     path: '/product/:id(\\d+)?',
-    //     name: 'productItem',
-    //     component: ProductItem,
-    // },
 
     // not found
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
