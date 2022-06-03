@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -38,5 +39,15 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    // public function render($request, Exception $exception)
+    // {
+    //     if ($exception instanceof ThrottleRequestsException) {
+    //     //Do whatever you want here.
+    //         return response()->json('Search nhieu l', 200, $headers);
+    //     }
+
+    //     return parent::render($request, $exception);
+    // }
     
 }

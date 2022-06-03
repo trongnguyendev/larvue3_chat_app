@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Models\PasswordReset;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -15,7 +16,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'check_mail', 'reset_password', 'forgotPassword', 'resetPassword', 'updatePassword']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'me', 'refresh', 'check_mail', 'reset_password', 'forgotPassword', 'resetPassword', 'updatePassword']]);
     }
 
     /**
@@ -54,6 +55,8 @@ class AuthController extends Controller
             'password'  => bcrypt($request['password'])
         ]);
 
+        $profile = UserProfile::createProfile(['user_id' => $user['id']]);
+
         $token = auth()->attempt($request->all());
 
         $data = [
@@ -69,10 +72,10 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me()
-    {
-        return response()->json(auth()->user());
-    }
+    // public function me()
+    // {
+    //     return response()->json(auth()->user());
+    // }
 
     /**
      * Log the user out (Invalidate the token).
@@ -176,9 +179,6 @@ class AuthController extends Controller
     }
 
     public function resetPassword(Request $request, $token) {
-        var_dump($token);
-        var_dump($request->all());
-        die();    
     }
 
     public function updatePassword(Request $request) {

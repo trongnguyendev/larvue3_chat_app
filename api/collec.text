@@ -7,3 +7,8 @@ php artisan vendor:publish --tag=laravel-mail
 clear cache
 php artisan optimize:clear
 
+
+
+vue
+import file syntax
+@import "assets/style.css"

@@ -1,9 +1,9 @@
 <template>
     <div class="grid container bg-white">
         <div class="p-9  rounded-md justify-between m-auto">
-            <h2 class="text-[24px] font-bold text-color-t">Xin chào,</h2>
-            <div class="form-register grid gap-3">
-                <h1 class="text-s-17 mb-3 text-color-t">Nhập email reset password</h1>
+            <h2 class="text-[24px] font-bold text-color-t">{{ $t('general.hi') }}</h2>
+            <div class="form-register grid gap-3" v-if="!message_sendmail">
+                <h1 class="text-s-17 mb-3 text-color-t">{{ $t('reset_password.lb_mail_reset') }}</h1>
                 <form action="" class="grid gap-3" @submit.prevent="submitForm">
                     <InputText 
                         v-model="email"
@@ -12,9 +12,8 @@
                         :placeHolder="$t('login.enter_email')">
                         <MailIcon class="w-5 h-5 text-gray-500 mr-1" />
                     </InputText>
-                    <ErrorMessage v-if="v$.email.$error">Mail field has an error.</ErrorMessage>
-
-
+                    <ErrorMessage v-if="v$.email.$error">{{v$.email.$errors.$message}}</ErrorMessage>
+                    <ErrorMessage v-if="message_sendfail">{{message_sendfail}}</ErrorMessage>
                     
                     <button class="mt-3 bg-primary rounded-md text-14 text-white w-full py-3 font-bold flex justify-center items-center">
                         <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" v-if="isRequestOngoing">
@@ -24,6 +23,11 @@
                         Reset Password
                     </button>
                 </form>
+                
+            </div>
+
+            <div v-if="message_sendmail">
+                {{message_sendmail}}
             </div>
         </div>
     </div>
@@ -49,6 +53,8 @@ export default {
     data() {
         return {
             email: '',
+            message_sendmail: '',
+            message_sendfail: '',
             isRequestOngoing: false,
         }
     },
@@ -110,7 +116,9 @@ export default {
             this.showNotification(data_notification)
             
             if(response.status) {
-                
+                this.message_sendmail = response.message
+            } else {
+                this.message_sendfail = response.message
             }
         }
     }

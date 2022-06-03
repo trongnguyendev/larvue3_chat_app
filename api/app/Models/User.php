@@ -9,6 +9,9 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Contracts\Auth\CanResetPassword;
+use App\Models\UserProfile;
+use App\Models\Friend;
+use App\Models\Participant;
 
 class User extends Authenticatable implements JWTSubject, CanResetPassword
 {
@@ -52,4 +55,26 @@ class User extends Authenticatable implements JWTSubject, CanResetPassword
     {
         return [];
     }
+
+    public function accept_relationship()
+    {
+        
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class);
+    }
+
+    public function friends()
+    {
+        return $this->hasMany(Friend::class);
+    }
+    
+
+    public function participant()
+    {
+        return $this->hasMany(Participant::class);
+    }
+
 }

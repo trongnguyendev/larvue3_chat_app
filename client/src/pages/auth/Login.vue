@@ -11,7 +11,7 @@
                         :placeHolder="$t('login.enter_email')">
                         <UserIcon class="w-5 h-5 text-gray-500 mr-1" />
                     </InputText>
-                    <ErrorMessage v-if="v$.email.$error">Mail field has an error.</ErrorMessage>
+                    <ErrorMessage v-if="errorsForm.email">{{errorsForm.email}}</ErrorMessage>
 
                     <InputText
                         v-model="password" 
@@ -20,7 +20,10 @@
                         :placeHolder="$t('login.enter_password')">
                         <KeyIcon class="w-5 h-5 text-gray-500 mr-1" />
                     </InputText>
-                    <ErrorMessage v-if="v$.password.$error">Password field has an error.</ErrorMessage>
+                    <ErrorMessage v-if="errorsForm.password">{{errorsForm.password}}</ErrorMessage>
+                    <ErrorMessage v-if="isErrorForm">Login fail!</ErrorMessage>
+                    
+
 
                     <div class="flex justify-between">
                         <label class="flex items-center mb-3">
@@ -63,13 +66,24 @@
 </template>
 
 <script>
+// icon
 import { UserIcon, KeyIcon, MailIcon } from '@heroicons/vue/solid'
+
+// vuex
 import { mapActions, mapState } from 'vuex'
+
+// vuelidate
 import useVuelidate from '@vuelidate/core'
 import { required, email, shouldBeChecked, sameAs, helpers } from '@vuelidate/validators'
 import { useToast } from "vue-toastification";
 
+// mixins
+import { replaceValidate } from '@/mixins/replaceValidate'
+import { enCodePassword, deCodePassword } from '@/mixins/convertPassword'
+
 export default {
+    mixins: [replaceValidate],
+
     setup () {
         const toast = useToast();
         return { v$: useVuelidate(), toast }
@@ -84,9 +98,13 @@ export default {
         return {
             email: '',
             password: '',
-
             isRequestOngoing: false,
-            isRemember: false
+            isRemember: false,
+
+            errorsForm: {
+                email: '',
+                password: '',
+            },
         }
     },
     validations () {
@@ -101,9 +119,6 @@ export default {
             token: state => state.token,
             loggedIn: state => state.loggedin
         }),
-        ...mapState('notification', {
-
-        })
     },
 
     created() {
@@ -127,22 +142,14 @@ export default {
             if(this.$cookies.get('loginRemember') != null) {
                 let data_cookie = this.$cookies.get('loginRemember')
                 this.email = data_cookie.email
-                this.password = this.deCodePassword(data_cookie.password)
+                this.password = deCodePassword(data_cookie.password)
                 this.isRemember = true
             }
         },
 
-        enCodePassword(pw) {
-            return btoa(encodeURIComponent(pw))
-        },
-
-        deCodePassword(pw) {
-            return decodeURIComponent(atob(pw))
-        },
-
         saveRemember() {
             if(this.isRemember) {
-                this.$cookies.set('loginRemember', JSON.stringify({email: this.email, password: this.enCodePassword(this.password)}));
+                this.$cookies.set('loginRemember', JSON.stringify({email: this.email, password: enCodePassword(this.password)}));
             } else {
                 if(this.$cookies.get('loginRemember') != null) {
                     this.$cookies.remove('loginRemember')
@@ -154,8 +161,13 @@ export default {
         {
             const isFormCorrect = await this.v$.$validate()
 
-            if (!isFormCorrect) return
-            
+            if (!isFormCorrect) {
+                this.errorsForm = this.replaceMessage(this.errorsForm, this.v$.$errors);
+                return
+            } 
+
+            this.errorsForm = this.resetValidate(this.errorsForm)
+
             this.isRequestOngoing = true
 
             let response = await this.login({
@@ -166,6 +178,7 @@ export default {
             this.isRequestOngoing = false
 
             if (response.status == 0) {
+
                 let data_notification = {
                     'title': 'Login fail',
                     'message': 'message login success',
@@ -173,6 +186,8 @@ export default {
                 }
 
                 this.showNotification(data_notification)
+                this.isErrorForm = true
+
             } else {
 
                 this.saveRemember()
@@ -184,13 +199,8 @@ export default {
                 }
 
                 this.showNotification(data_notification)
-
-                // let response_me = await this.me()
-                
                 this.$router.push("/message");
-                // v$.$reset()
-
-                // console.log(this.user)
+                
             }
 
             

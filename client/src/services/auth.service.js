@@ -58,25 +58,13 @@ class AuthService {
             return response.data
         })
     }
-    
-    me() {
-        // let user = localStorage.getItem('user')
-        return axios.get(API_URL + 'me', {
-            // headers: {
-            //     Authorization: 'Bearer ' + JSON.parse(user).access_token //the token is a variable which holds the token
-            // }
-        })
+
+    refreshToken() {
+        return axios.post(API_URL + 'refresh')
         .then(response => {
-            console.log(response)
-        })
-        .catch(error => {
-            console.log(err)
+            return response
         })
     }
-
-
-
-
 }
 
 export default new AuthService();

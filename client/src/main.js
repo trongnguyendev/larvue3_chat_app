@@ -33,8 +33,6 @@ const globalCookiesConfig = {
     secure: true,
     sameSite: "None",
 };
-
-
   
 // register componenet global
 import ErrorMessage from '@/components/base/ErrorMessage'
@@ -43,6 +41,8 @@ import InputCheckbox from '@/components/base/InputCheckbox'
 import InputRadio from '@/components/base/InputRadio'
 import InputRadioGroup from '@/components/base/InputRadioGroup'
 import auth from './stores/modules/auth'
+
+import AuthService from '@/services/auth.service'
 
 const app = createApp(App)
 app.use(router)
@@ -103,15 +103,26 @@ app.config.globalProperties.configToast = []
 
 axios.interceptors.request.use(request => {
     let user = localStorage.getItem('user')
+    console.log("user: " + user);
     let token = JSON.parse(user);
 
     if(user) {
-        request.headers.common.Authorization = `Bearer ${token.access_token}`;
+        request.headers.common.Authorization = `Bearer ${token}`;
     }
 
     return request
 })
 
-axios.interceptors.response.use(response => {
-    return response
-})
+axios.interceptors.response.use(
+    (response) => {
+        return response
+    },
+    (err) => {
+        // console.log(err.response)
+        // let refreshToken = AuthService.refreshToken()
+        // console.log(refreshToken)
+        // localStorage.setItem('user', refreshToken.access_token)
+        // console.log(refreshToken);
+        // return AuthService.refreshToken()
+    }
+)

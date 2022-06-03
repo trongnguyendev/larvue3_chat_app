@@ -7,7 +7,12 @@
             <div class="shape_other"></div>
         </div>
         </div>
-        <input type="text" placeholder="Aa" v-model="inputMessage" class="input input-ghost w-full bg-opacity-20 bg-transparent h-8 focus:outline-none focus:bg-opacity-20 px-2 py-4">
+        <input
+        type="text" 
+        placeholder="Aa" 
+        v-model="inputMessage" 
+        @keyup.enter="sendMessage"
+        class="input input-ghost w-full bg-opacity-20 bg-transparent h-8 focus:outline-none focus:bg-opacity-20 px-2 py-4">
     </div>
 </template>
 
@@ -33,10 +38,16 @@ export default {
     },
     methods: {
         showEmoji(emoji) {
-        console.log(emoji)
-        this.inputMessage += emoji.native;
-        console.log(this.inputMessage)
-    }
+            console.log(emoji)
+            this.inputMessage += emoji.native;
+            console.log(this.inputMessage)
+        },
+        sendMessage() {
+            console.log(this.inputMessage)
+            this.$emit('someEvent', this.inputMessage)
+            this.inputMessage = ''
+            
+        }
     }
 }
 </script>

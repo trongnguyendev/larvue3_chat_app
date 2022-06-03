@@ -9,13 +9,13 @@ import ProductItemPhone from '@/views/ProductItemPhone'
 import ProductItemTv from '@/views/ProductItemTv'
 import NotFound from '@/pages/error/NotFound'
 
-import Auth from '@/components/layout/Auth'
+import Auth from '@/layouts/Auth'
 import Login from '@/pages/auth/Login'
 import Register from '@/pages/auth/Register'
 import ForgotPassword from '@/pages/auth/ForgotPassword'
 import ResetPassword from '@/pages/auth/ResetPassword'
 
-import Chat from '@/components/layout/Chat'
+import Chat from '@/layouts/Chat'
 
 const routes = [
 

@@ -1,6 +1,6 @@
 {
     "general": {
-        
+        "hi": "Xin chào,"
     },
     "login": {
         "name": "Tên",
@@ -23,6 +23,9 @@
         "btn_login": "Đăng nhập",
         "accept_with_policie": "Tôi đồng ý với các điều khoản & quy định.",
         "have_account": "Bạn đã có tài khoản?"
+    },
+    "reset_password": {
+        "lb_mail_reset": "Nhập email reset password"
     },
     "validation": {
         "required": "Field is required",
