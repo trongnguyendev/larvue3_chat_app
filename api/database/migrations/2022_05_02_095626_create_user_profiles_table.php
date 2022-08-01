@@ -17,8 +17,7 @@ class CreateUserProfilesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->date('birthday')->nullable();
-            $table->string('avarta')->nullable()->default('');
-
+            $table->string('avatar')->nullable()->default('');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });

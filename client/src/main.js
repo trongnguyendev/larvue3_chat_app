@@ -33,6 +33,33 @@ const globalCookiesConfig = {
     secure: true,
     sameSite: "None",
 };
+
+import timeago from 'vue-timeago3'
+
+const timeagoOptions = {
+    converterOptions: {
+        includeSeconds: true,
+        locale: 'vn'
+
+    }
+  }  
+// socket
+import Echo from 'laravel-echo';
+
+window.Pusher = require('pusher-js');
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: process.env.VUE_APP_WEBSOCKETS_KEY,
+    wsHost: process.env.VUE_APP_WEBSOCKETS_SERVER,
+    wsPort: 6001,
+    forceTLS: false,
+    disableStats: true
+});
+
+// import VueSocketIO from 'vue-3-socket.io'
+// import SocketIo from 'socket.io-client'
+
   
 // register componenet global
 import ErrorMessage from '@/components/base/ErrorMessage'
@@ -49,6 +76,8 @@ app.use(router)
 app.use(store)
 app.use(i18n)
 app.use(VueCookies, globalCookiesConfig)
+app.use(timeago, timeagoOptions)
+
 app.mount('#app')
 
 const options = {
@@ -103,7 +132,6 @@ app.config.globalProperties.configToast = []
 
 axios.interceptors.request.use(request => {
     let user = localStorage.getItem('user')
-    console.log("user: " + user);
     let token = JSON.parse(user);
 
     if(user) {
@@ -118,7 +146,10 @@ axios.interceptors.response.use(
         return response
     },
     (err) => {
-        // console.log(err.response)
+        if(err.response.data.message == 'Unauthenticated.' && err.response.status == 401) {
+            localStorage.removeItem("user");
+            return promise.reject(error)
+        }
         // let refreshToken = AuthService.refreshToken()
         // console.log(refreshToken)
         // localStorage.setItem('user', refreshToken.access_token)

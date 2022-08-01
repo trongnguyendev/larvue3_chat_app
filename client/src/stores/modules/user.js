@@ -5,7 +5,7 @@ const isToken = JSON.parse(localStorage.getItem('user'));
 const initialState = {
     user: [],
     profile: [],
-    friends: []
+    friends_current: []
 }
 
 export default {
@@ -16,8 +16,8 @@ export default {
         inforUser(state) {
             return state.user
         },
-        friends(state) {
-            return state.friends
+        friends_current(state) {
+            return state.friends_current
         }
     },
 
@@ -29,8 +29,8 @@ export default {
         ['SET_PROFILE_USER'](state, data) {
             state.profile = data
         },
-        ['GET_FRIEND'](state, data) {
-            state.friends = data
+        ['SET_FRIEND'](state, data) {
+            state.friends_current = data
         }
     },
 
@@ -63,9 +63,22 @@ export default {
             })
         },
 
-        insertFriend({ commit }, data) {
+        getFriendsByStatus({ commit }, data) {
             return new Promise((resolve, reject) => {
-                UserService.insertFriend(data)
+                UserService.getFriendsByStatus(data)
+                .then((response) => {
+                    commit('SET_FRIEND', response.results.relationships)
+                    resolve(response)
+                })
+                .catch((err) => {
+                    reject (err)
+                })
+            })
+        },
+
+        addFriend({ commit }, data) {
+            return new Promise((resolve, reject) => {
+                UserService.addFriend(data)
                 .then((response) => {
                     resolve(response)
                 })
@@ -75,18 +88,18 @@ export default {
             })
         },
 
-        listFriend({ commit }, data) {
+        updateRelationshipByStatus({ commit }, data) {
             return new Promise((resolve, reject) => {
-                UserService.listFriend(data)
+                console.log(data.status)
+                UserService.updateRelationshipByStatus(data)
                 .then((response) => {
-                    commit('GET_FRIEND', response.results.user_friend)
-                    resolve(response.results.user_friend)
+                    resolve(response)
                 })
                 .catch((err) => {
                     reject (err)
                 })
             })
-        }
+        },
         
 
 

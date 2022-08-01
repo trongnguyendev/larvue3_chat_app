@@ -55,15 +55,30 @@ Route::group([
     Route::post('message', [MessagesController::class, 'store'])->name('message.store');
 
     Route::get('me', [UserProfileController::class, 'me'])->name('user.me');
-    Route::post('find_friend', [UserProfileController::class, 'findFriend'])->name('user.findFriend');
-
-    Route::post('insert_friend', [FriendController::class, 'insert_friend'])->name('friend.insert');
-    Route::post('list_friend', [FriendController::class, 'list_friend'])->name('friend.list');
+    // Route::post('find_friend', [UserProfileController::class, 'findFriend'])->name('user.findFriend');
 
     Route::post('check_conversation', [ConversationController::class, 'getConversationByUser'])->name('conversation.check');
     Route::post('get_conversation', [ConversationController::class, 'getMessageConversationsByUser'])->name('conversation.getByUser');
 
     Route::post('create_conversation', [ConversationController::class, 'sendMessage'])->name('conversation.create');
+
+
+    // new api
+    Route::post('find_friend', [FriendController::class, 'find_user'])->name('friend.find_user');
+    Route::post('create_relationship', [FriendController::class, 'create_relationship'])->name('relationship.create');
+    Route::post('get_relationships_by_status', [FriendController::class, 'get_relationships_by_status'])->name('relationship.list');
+    Route::post('update_relationship_by_status', [FriendController::class, 'update_relationship_by_status'])->name('relationship.update_status');
+
+    // new group chat api
+    Route::post('create_group', [GroupChatController::class, 'create_group'])->name('group.create');
+    Route::post('get_group', [GroupChatController::class, 'get_group'])->name('group.create');
+
+    Route::post('get_message_by_group_id', [GroupChatController::class, 'get_messages_by_groups'])->name('group.get_message_by_group');
+    Route::post('send_message', [GroupChatController::class, 'send_message'])->name('group.send_message');
+
+
+    //
+    
 });
 
 

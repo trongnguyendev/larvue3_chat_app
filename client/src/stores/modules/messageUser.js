@@ -1,14 +1,10 @@
-// import AuthService from '@/services/auth.service';
 import MessageService from '@/services/message.service'
 
 const initialState = {
     userMessage: [],
-    friendInfor: {
-        name: '',
-        email: '',
-        avarta: '',
-        friend_id: '',
-    },
+    friendInfor: {},
+    groupId: null,
+    messages: [],
     
 }
 
@@ -22,56 +18,57 @@ export default {
         },
         friendInfor(state) {
             return state.friendInfor
+        },
+        messages(state) {
+            return state.messages
         }
     },
 
     mutations: {
-        ['SET_CURRENT_USER_MESSAGE'](state, data) {
-            state.userMessage = data
-        },
-        ['ADD_MESSAGE'](state, data) {
-            state.userMessage.push(data)
-        },
-        ['SET_FRIEND_INFOR'](state, data) {
+        ['SET_FRIEND_MESSENGER_INFOR'](state, data) {
             state.friendInfor = data
+        },
+
+        ['SET_GROUP_ID'](state, data) {
+            state.groupId = data
+        },
+
+        ['SET_MESSAGES_CURRENT'](state, data) {
+            state.messages = data
+        },
+
+        ['PUSH_MESSAGE'](state, data) {
+            state.messages.push(data)
         }
 
     },
 
     actions: {
-        loadcurrentMessageByUser({ commit }, data) {
+
+        sendMessage({ commit }, data) {
+             return new Promise((resolve, reject) => {
+                MessageService.sentMessage(data)
+                .then((response) => {
+                    resolve(response)
+                })
+                .catch((err) => {
+                    reject (err)
+                })
+             })
+        },
+
+        getMessageByGroup({ commit }, data) {
             return new Promise((resolve, reject) => {
                 MessageService.getCurrentMessageByUser(data)
                 .then((response) => {
-                    commit('SET_CURRENT_USER_MESSAGE', response.results.conversation)
-
-                    let friend_infro = response.results.friend_infor
-                    let data = {
-                        name: friend_infro.name,
-                        email: friend_infro.email,
-                        avarta: friend_infro.profile.avarta,
-                        friend_id: friend_infro.id
-                    }
-                    commit('SET_FRIEND_INFOR', data)
+                    commit('SET_GROUP_ID', response.results.group_id)
+                    commit('SET_MESSAGES_CURRENT', response.results.messages)
                     resolve(response)
                 })
                 .catch((err) => {
                     reject (err)
                 })
             })
-        },
-        
-        setCurrentUserMessage({ commit }, data) {
-            return new Promise((resolve, reject) => {
-                MessageService.setUserCurrentMessage(data)
-                .then((response) => {
-                    commit('ADD_MESSAGE', response.results.message)
-                    resolve(response)
-                })
-                .catch((err) => {
-                    reject (err)
-                })
-            })
-        },
+        }
     }
 }

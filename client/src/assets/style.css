@@ -7,6 +7,7 @@
   --color-1st: #1c9dea;
   --color-2nd: #e5edf5;
   --color-3rd: #eff7fe;
+  --height-main-side: calc(100% - 257px);
 
   /* divide */
   --dv: #e5e7eb;

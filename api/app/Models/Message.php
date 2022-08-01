@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Conversation;
+use App\Models\GroupChat;
 
 class Message extends Model
 {
@@ -13,44 +14,23 @@ class Message extends Model
     protected $table = 'messages';
 
     protected $fillable = [
-        'conversation_id',
-        'user_id',
+        'sender_id',
+        'receiver_id',
+        'group_id',
         'message_type',
-        'message'
+        'content'
     ];
 
-    public function conversation()
+    // protected $dateFormat = 'Y-m-d';
+
+    public static function create_message_by_type()
     {
-        return $this->belongsTo(Conversation::class);
+
     }
 
-    public static function createMessage($data)
+    public static function get_messages_by_group_id($group_id)
     {
-        $message = Message::create($data);
-
-        return $message;
+        return self::where('group_id', '=', $group_id)->get();
     }
 
-    public static function updateMessage($request, $message)
-    {
-        $data = $request->only([
-            'conversation_id',
-            'user_id',
-            'message_type',
-            'message'
-        ]);
-
-        $customer->update($data);
-
-        return $customer;
-    }
-
-    public static function deleteMessage($id)
-    {
-        $customer = self::find($id);
-
-        $customer->delete();
-
-        return true;
-    }
 }

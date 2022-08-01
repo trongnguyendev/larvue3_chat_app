@@ -1,13 +1,13 @@
 <template>
     <div :class="{ 'tooltip tooltip-right z-10': tooltip  }"  :data-tip="name">
         <div class="avatar mx-auto" v-if="avarta">
-            <div class="w-7 rounded-full ring ring-1st ring-offset-base-100 ring-offset-2 cursor-pointer">
+            <div :class="size" class="rounded-full ring ring-1st ring-offset-base-100 ring-offset-2 cursor-pointer">
                 <img src="https://api.lorem.space/image/face?hash=55350" />
             </div>
         </div>
         <div class="avatar placeholder" v-if="!avarta">
-            <div class="bg-neutral-focus text-neutral-content rounded-full w-7">
-                <span>{{ setAvartarDefault() }}</span>
+            <div :class="size" class="bg-neutral-focus text-neutral-content rounded-full">
+                <span :style="{fontSize: textSize}">{{ setAvartarDefault() }}</span>
             </div>
         </div> 
     </div>
@@ -30,7 +30,15 @@ export default {
         tooltip: {
             type: Boolean,
             default: false
-        }
+        },
+        size: {
+            type: String,
+            default: 'w-7'
+        },
+        textSize: {
+            type: String,
+            default: '17px'
+        },
     },
 
     data() {

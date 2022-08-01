@@ -14,7 +14,17 @@ class MessageService {
     }
 
     getCurrentMessageByUser(data) {
-        return axios.post(API_URL + 'get_conversation', data)
+        return axios.post(API_URL + 'get_message_by_group_id', data)
+        .then(response => {
+            return response.data
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+
+    sentMessage(data) {
+        return axios.post(API_URL + 'send_message', data)
         .then(response => {
             return response.data
         })

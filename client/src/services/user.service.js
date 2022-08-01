@@ -25,8 +25,18 @@ class UserService {
         })
     }
 
-    insertFriend(data) {
-        return axios.post(API_URL + 'insert_friend', data)
+    getFriendsByStatus(data) {
+        return axios.post(API_URL + 'get_relationships_by_status', data)
+        .then(response => {
+            return response.data
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+
+    addFriend(data) {
+        return axios.post(API_URL + 'create_relationship', data)
         .then(response => {
             console.log(response)
             return response.data
@@ -36,8 +46,8 @@ class UserService {
         })
     }
 
-    listFriend(data) {
-        return axios.post(API_URL + 'list_friend', data)
+    updateRelationshipByStatus(data) {
+        return axios.post(API_URL + 'update_relationship_by_status', data)
         .then(response => {
             console.log(response)
             return response.data

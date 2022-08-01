@@ -38,7 +38,7 @@
             
             </TabList>
             <TabPanels>
-                <div class="aside-main w-[400px]">
+                <div class="aside-main w-[350px]">
                     <!-- profile panel -->
                     <TabPanel>Content 2</TabPanel>
                     <!-- chat panel -->
@@ -86,27 +86,44 @@
                                 <div class="panel_search" v-if="is_search_friend">
 
                                     <!-- no result -->
-                                    <div v-if="friends.length == 0 && !loading_find_friend" class="px-3">{{ message_seach }}</div>
+                                    <div v-if="friends.length == 0 && !loading_find_friend" class="px-3">{{ message_search }}</div>
 
                                     <!-- list result -->
                                     <div 
                                     class="flex gap-4 py-3 px-3 cursor-pointer ease-linear items-center hover:bg-3rd"
                                     v-for="friend in friends" 
-                                    :key="friend.id" @click="setConversation(friend.id)">
-                                        <Avartar :avarta="friend.avarta" :name="friend.name" :tooltip="false" />       
+                                    :key="friend.id">
+                                        <Avartar :avarta="friend.avarta" :name="friend.name" :tooltip="false" />    
+
                                         <div class="w-full">
                                             <h3 class="flex items-center justify-start text-5th text-sm" v-html="set_highlight(friend.name)"></h3>
                                         </div>
-                                        <div @click="insert_friend(friend.id)" v-if="friend.friend_id == null && friend.user_id == null" >
-                                            <UserAddIcon class="w-6 text-gray-500"/> 
+
+                                        <div v-if="friend.status != 2">
+                                            <!-- action friend -->
+                                            <div v-if="friend.status == null || friend.status == '0'"  @click="add_relationship(friend.id, 1)">
+                                                <UserAddIcon class="w-6 text-gray-500"/> 
+                                            </div>
+
+                                            <div class="flex gap-2"
+                                            v-else-if="friend.status == 1 && friend.user_2_id == option.id"
+                                            @click="add_relationship(friend.id, 2)"
+                                            >
+                                                <XIcon class="w-6 text-gray-500" /> 
+                                                <CheckIcon  class="w-6 text-gray-500" />
+                                            </div>
+
+                                            <div
+                                            v-else-if="friend.status == 1 & friend.user_1_id == option.id"
+                                            @click="add_relationship(friend.id, 3)"
+                                            >
+                                                <button class="text-gray-500">Cancel</button>
+                                            </div>
                                         </div>
-                                        <div class="flex gap-2" v-if="friend.friend_id == option.id && friend.relation_type == 0">
-                                            <XIcon class="w-6 text-gray-500" /> 
-                                            <CheckIcon  class="w-6 text-gray-500" />
+                                        <div v-else class="text-gray-500" @click="add_relationship(friend.id, 3)">
+                                            Unfriend
                                         </div>
-                                        <div v-if="friend.user_id == option.id && friend.relation_type == 0">
-                                            Cancel
-                                        </div>
+                                        
                                     </div>
 
                                     <!-- effect loading -->
@@ -120,8 +137,8 @@
 
                                 <div class="recents_message mt-4 h-recent" v-if="!is_search_friend">
                                     <div class="flex gap-4 py-3 px-3 cursor-pointer ease-linear items-center"
-                                    @click="current_user_message(friend.id, friend.idd)" :class="friend.id == current_message ?  'message_active' : ''"
-                                    v-for="(friend, index) in message_user_current" :key="index" :data-id="friend.id">
+                                    @click="current_user_message(friend.user_id)" :class="friend.user_id == current_friend_id ?  'message_active' : ''"
+                                    v-for="(friend, index) in friends_current" :key="index" :data-id="friend.id">
                                         <Avartar :avarta="friend.avarta" :name="friend.name" :tooltip="false" />  
                                         <div class="w-full">
                                             <h3 class="font-bold flex items-center justify-between text-5th text-sm">{{friend.name}} <span class="text-xs text-5th font-extralight">{{friend.created_at}}</span></h3>
@@ -157,9 +174,11 @@ import { LogoutIcon, AnnotationIcon, CogIcon, MoonIcon, SunIcon, BellIcon, UserA
 import Avartar from '@/components/Avatar'
 // import { MoonIcon } from '@heroicons/vue/solid'
 
+import { get_element_by_attribute } from '@/mixins/arrayHelper'
+
 import axios from "axios"
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 
 export default {
     props: ['option'],
@@ -182,9 +201,13 @@ export default {
 
     data() {
         return {
+            // mode dark/light
             isDark: false,
-            current_message: 1,
-            message: '',
+
+            // friend chat current
+            current_friend_id: 1,
+
+            // friend online
             user_current: [
                 { name: 'Toni Dev', avarta: 'https://api.lorem.space/image/face?hash=88560' },
                 { name: 'Calvin Tuan', avarta: 'https://api.lorem.space/image/face?hash=26448' },
@@ -192,46 +215,32 @@ export default {
                 { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=27312' },
             ],
 
-            message_user_current: [
-                { name: 'Toni Dev', avarta: 'https://api.lorem.space/image/face?hash=88560', mess_short : '...', type: 'seen', time: '22/10/2019', id: 1 },
-                { name: 'Calvin Tuan', avarta: 'https://api.lorem.space/image/face?hash=26448', mess_short : '...', type: 'not_seen', time: '22/10/2019', id: 2 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 3 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 4 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 5 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 6 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 7 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 8 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 9 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 10 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 11 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 12 },
-                { name: 'Henry', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 13 },
-                { name: 'Henry1', avarta: 'https://api.lorem.space/image/face?hash=2642731248', mess_short : '...', type: 'seen', time: '22/10/2019', id: 14 },
-            ],
-
+            // search
             is_search_friend: false,
             ip_search: '',
+
+            // friend list
             friends: [],
             loading_find_friend: false,
-            message_seach: ''
+            message_search: '',
+
+            // messenger current
+            friend_messenger_current: []
+
         }
     },
 
     computed: {
         ...mapGetters(['darkMode']),
-        ...mapGetters('user', ['friends'])
+        ...mapGetters('user', ['friends_current'])
     },
 
     watch: {
-    },
 
-    mounted() {
-        
     },
 
     created() {
         this.get_friends()
-
         
     },
 
@@ -240,23 +249,27 @@ export default {
 
         ...mapActions('auth', ['logout']),
 
-        ...mapActions('user', ['findFriend', 'insertFriend', 'listFriend']),
+        ...mapActions('user', ['findFriend', 'addFriend', 'getFriendsByStatus', 'updateRelationshipByStatus']),
 
         ...mapActions('messageUser', [
             'setCurrentUserMessage',
-            'loadcurrentMessageByUser'
+            'getMessageByGroup',
         ]),
+        ...mapMutations('messageUser', ['SET_FRIEND_MESSENGER_INFOR']),
 
+        // set mode theme
         toggleDarkMode() {
             this.isDark = !this.isDark
             this.SET_DARKMODE(this.isDark)
         },
         
+        // set log out
         setLogout() {
             this.logout()
             this.$router.push("/login")
         },
 
+        // search friends
         async search_friend($event) {
             this.is_search_friend = $event.target.value == '' ? false : true
             // if(this.ip_search != $event.target.value) return
@@ -270,22 +283,24 @@ export default {
                 this.loading_find_friend = true
                 let response = await this.findFriend(this.ip_search)
 
+                console.log(response)
+
                 if(response == undefined) {
-                    this.message_seach = 'Ban seach qua nhieu, hay tim kiem sau nhe.'
+                    this.message_search = 'Ban seach qua nhieu, hay tim kiem sau nhe.'
                 }
                 else if(response.status == 1) {
                     this.friends = response.results.users
 
                     if(this.friends.length == 0) {
-                        this.message_seach = 'Not result.'
+                        this.message_search = 'Not result.'
                     }
                 }                
             }
 
-            // this.is_search_friend = false
             this.loading_find_friend = false
         },
 
+        // set highlight name friend search
         set_highlight(str) {
             
             let name = str.toUpperCase();
@@ -307,49 +322,55 @@ export default {
             return str;            
         },
 
-        async insert_friend(id_friend) {
-            let data = {
-                user_id: this.option.id,
-                friend_id: id_friend,
-                friend: '0'
-            }
-            let response = await this.insertFriend(data)
-
-            if(response.status == 1) {
-
-            }
-        },
-
+        // get all friend
         async get_friends() {
-            let res = await this.listFriend(this.option.id);
-            console.log(res)
-            this.message_user_current = res
+            let res = await this.getFriendsByStatus({'status': '2'});   
         }, 
 
-        async current_user_message(id, friend_id) {
+        async current_user_message(id) {
+            this.current_friend_id = id
+            let element = get_element_by_attribute(this.friends_current, 'user_id', id)
+            this.SET_FRIEND_MESSENGER_INFOR(element)
 
-            // Check conversation
-            
+            let messages = await this.getMessageByGroup({ friend_id: id })
+            console.log("get message")
+            console.log(messages)
 
-            // Get message conversation
-        
+        },
+
+        async add_relationship(id_friend, status) {
+            console.log(id_friend);
+            console.log(status);
+
+            const STATUS_CANCEL = '0';
+            const STATUS_REQUESTED = '1';
+            const STATUS_ACCEPTED = '2';
+
+            let res = null;
+
+            switch(status) {
+                case 1:
+                    // add friend
+                    console.log("add friend")
+                    res = await this.addFriend({ friend_id: id_friend})
+                    break;
+                case 2:
+                    //accept friend
+                    console.log("accept friend")
+                    res = await this.updateRelationshipByStatus({ friend_id: id_friend, status: STATUS_ACCEPTED})
+                    break;
+                case 3:
+                    // cancel friend / unfriend 
+                    console.log("cancel friend")
+                    res = await this.updateRelationshipByStatus({ friend_id: id_friend, status: STATUS_CANCEL})
+                    break;
+                default:
+                    res = await this.addFriend({ friend_id: id_friend})                    
+                    break;
+            }            
+        },
 
 
-
-            // let data_request = {
-            //     'user_id': 1,
-            //     'friend_id': id,
-            //     'message_type': 1,
-            //     'message': 'heheeheh'
-            // }
-
-            // let res = await this.setCurrentUserMessage(data_request)
-
-            let res = await this.loadcurrentMessageByUser({'friend_id': friend_id})
-            console.log(res)
-            this.current_message = id
-
-        }
     }
 }
 </script>
