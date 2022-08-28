@@ -7,6 +7,7 @@ use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\GroupChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,8 @@ Route::group([
 
     Route::post('get_message_by_group_id', [GroupChatController::class, 'get_messages_by_groups'])->name('group.get_message_by_group');
     Route::post('send_message', [GroupChatController::class, 'send_message'])->name('group.send_message');
+
+    Route::post('get_last_message_by_group_name', [FriendController::class, 'get_last_message_by_group_name'])->name('friend.get_last_message');
 
 
     //

@@ -91,7 +91,7 @@
                                     <!-- list result -->
                                     <div 
                                     class="flex gap-4 py-3 px-3 cursor-pointer ease-linear items-center hover:bg-3rd"
-                                    v-for="friend in friends" 
+                                    v-for="friend in friends"
                                     :key="friend.id">
                                         <Avartar :avarta="friend.avarta" :name="friend.name" :tooltip="false" />    
 
@@ -136,13 +136,23 @@
                                 </div>
 
                                 <div class="recents_message mt-4 h-recent" v-if="!is_search_friend">
-                                    <div class="flex gap-4 py-3 px-3 cursor-pointer ease-linear items-center"
-                                    @click="current_user_message(friend.user_id)" :class="friend.user_id == current_friend_id ?  'message_active' : ''"
-                                    v-for="(friend, index) in friends_current" :key="index" :data-id="friend.id">
-                                        <Avartar :avarta="friend.avarta" :name="friend.name" :tooltip="false" />  
+                                    <div class="flex gap-4 py-3 px-3 cursor-pointer ease-linear items-center rounded-r-lg hover:bg-slate-200"
+                                    
+                                    @click="current_user_message(friend.user_id)"
+                                    :class="[
+                                        friend.user_id == current_friend_id ?  'message_active' : '',
+                                        room_notify.includes(friend.room) ? 'message_notify' : '',
+                                    ]"
+                                     
+                                    v-for="(friend, index) in friends_current" :key="index" :data-id="friend.id" :attr="friend.room" :attr1="room_notify">
+                                        <Avartar :avarta="friend.avarta" :name="friend.name" size="w-10" :tooltip="false" />  
                                         <div class="w-full">
-                                            <h3 class="font-bold flex items-center justify-between text-5th text-sm">{{friend.name}} <span class="text-xs text-5th font-extralight">{{friend.created_at}}</span></h3>
-                                            <p class="text-xs text-5th">...</p>
+                                            <h3 class="font-bold flex items-center justify-between text-5th text-sm">{{friend.name}}
+                                                <!-- <span class="text-xs text-5th font-extralight">
+                                                    <timeago :refresh="1" :datetime="friend.created_at"/>
+                                                </span> -->
+                                            </h3>
+                                            <p class="text-xs text-5th opacity-70">{{ friend.last_message }}</p>
                                         </div>
                                     </div>
 
@@ -225,14 +235,14 @@ export default {
             message_search: '',
 
             // messenger current
-            friend_messenger_current: []
+            friend_messenger_current: [],
 
         }
     },
 
     computed: {
         ...mapGetters(['darkMode']),
-        ...mapGetters('user', ['friends_current'])
+        ...mapGetters('user', ['friends_current', 'room_current', 'room_notify'])
     },
 
     watch: {
@@ -240,7 +250,9 @@ export default {
     },
 
     created() {
-        this.get_friends()
+        this.$socketio.on('connectToRoom', (data) => {
+            console.log("data: " + data);
+        })
         
     },
 
@@ -255,7 +267,8 @@ export default {
             'setCurrentUserMessage',
             'getMessageByGroup',
         ]),
-        ...mapMutations('messageUser', ['SET_FRIEND_MESSENGER_INFOR']),
+        ...mapMutations('messageUser', ['SET_FRIEND_MESSENGER_INFOR', 'RESET_MESSAGE_USER', 'CLEAR_MESSAGE']),
+        ...mapMutations('user', ['RESET_INFOR', 'SET_ROOM_CURRENT', 'REMOVE_ROOM_NOTIFY']),
 
         // set mode theme
         toggleDarkMode() {
@@ -266,6 +279,9 @@ export default {
         // set log out
         setLogout() {
             this.logout()
+            this.RESET_INFOR();
+            this.RESET_MESSAGE_USER();
+
             this.$router.push("/login")
         },
 
@@ -282,8 +298,6 @@ export default {
                 this.is_search_friend = true
                 this.loading_find_friend = true
                 let response = await this.findFriend(this.ip_search)
-
-                console.log(response)
 
                 if(response == undefined) {
                     this.message_search = 'Ban seach qua nhieu, hay tim kiem sau nhe.'
@@ -322,25 +336,33 @@ export default {
             return str;            
         },
 
-        // get all friend
-        async get_friends() {
-            let res = await this.getFriendsByStatus({'status': '2'});   
-        }, 
-
         async current_user_message(id) {
+
             this.current_friend_id = id
+
             let element = get_element_by_attribute(this.friends_current, 'user_id', id)
+
             this.SET_FRIEND_MESSENGER_INFOR(element)
 
-            let messages = await this.getMessageByGroup({ friend_id: id })
-            console.log("get message")
-            console.log(messages)
+            let room = (this.option.id > id) ? (this.option.id + "_" + id + "_room") :  (id + "_" + this.option.id + "_room");
+
+            if(room != this.room_current) {
+                this.CLEAR_MESSAGE()
+                await this.getMessageByGroup({ friend_id: id })
+                this.$emit('chosenFriend', true);
+
+            }
+            
+            this.SET_ROOM_CURRENT(room)
+            this.REMOVE_ROOM_NOTIFY(room)
+
+            this.$socketio.emit('initial_socket', this.room_current)
+
+            
 
         },
 
         async add_relationship(id_friend, status) {
-            console.log(id_friend);
-            console.log(status);
 
             const STATUS_CANCEL = '0';
             const STATUS_REQUESTED = '1';

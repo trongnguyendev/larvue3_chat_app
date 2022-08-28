@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\GroupChat;
 use App\Models\Message;
 
+use App\Events\PrivateMessageEvent;
+
 class GroupChatController extends Controller
 {
     public function create_group(Request $request) {
@@ -50,6 +52,15 @@ class GroupChatController extends Controller
         $sent_mess = Message::create($data_message);
 
         if($sent_mess) {
+
+            $room = $request->sender_id > $request->receiver_id ? ($request->sender_id . '_' . $request->receiver_id . '_room') : ($request->receiver_id . '_' . $request->sender_id . '_room');
+
+            $data_socket_message = [
+                'room' =>  $room,
+                'message' => $sent_mess
+            ];
+
+            event(new PrivateMessageEvent($data_socket_message));
             return $this->response_json(1, 'send msg success', ['message' => $sent_mess]);
         }
 
@@ -57,7 +68,7 @@ class GroupChatController extends Controller
 
     public function get_messages_by_groups(Request $request)
     {
-
+        // sleep(2);
         $group = GroupChat::get_group_by_user(
             [
                 'auth_id' => auth()->id(),
@@ -65,13 +76,19 @@ class GroupChatController extends Controller
             ]
         );
 
-        $messages = Message::get_messages_by_group_id($group['id']);
+        $fromMessage = ($request->fromMessage) ? $request->fromMessage : 0;
+
+        $messages = Message::get_messages_by_group_id($group['id'], $fromMessage);
 
         $data_res = [
+            'request'  => $fromMessage,
             'group_id' => $group['id'],
             'messages' => $messages
         ];
 
+        if(empty($messages)) {
+            return $this->response_json(0, 'messages empty', $data_res);
+        }
         return $this->response_json(1, 'messages current', $data_res);
     }
 

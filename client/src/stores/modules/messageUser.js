@@ -5,6 +5,7 @@ const initialState = {
     friendInfor: {},
     groupId: null,
     messages: [],
+    typing: false,
     
 }
 
@@ -20,8 +21,21 @@ export default {
             return state.friendInfor
         },
         messages(state) {
-            return state.messages
-        }
+            let messages = state.messages.sort((m1, m2) => {
+                return m1.id - m2.id
+            })
+            return messages
+        },
+        isTyping(state) {
+            return state.typing
+        },
+        lastIdMessage(state) {
+            if(state.messages.length == 0) {
+                return null;
+            }
+            let messageLast = state.messages.slice(0,1)
+            return messageLast[0].id
+        },
     },
 
     mutations: {
@@ -39,6 +53,23 @@ export default {
 
         ['PUSH_MESSAGE'](state, data) {
             state.messages.push(data)
+        },
+        ['SET_TYPING'](state, data) {
+            if(data.auth_id == state.friendInfor.user_id) {
+                state.typing = data.type
+            }
+        },
+        ['RESET_MESSAGE_USER'](state, data) {
+            state.friendInfor = {},
+            state.groupId = null,
+            state.messages = [],
+            state.typing = false
+        },
+        ['LOAD_MORE_MESSAGE'](state, data) {
+            state.messages.push(...data)
+        },
+        ['CLEAR_MESSAGE'](state, data) {
+            state.messages = []
         }
 
     },
@@ -61,8 +92,10 @@ export default {
             return new Promise((resolve, reject) => {
                 MessageService.getCurrentMessageByUser(data)
                 .then((response) => {
-                    commit('SET_GROUP_ID', response.results.group_id)
-                    commit('SET_MESSAGES_CURRENT', response.results.messages)
+                    if(!data.fromMessage) {
+                        commit('SET_GROUP_ID', response.results.group_id)
+                        commit('SET_MESSAGES_CURRENT', response.results.messages)
+                    }
                     resolve(response)
                 })
                 .catch((err) => {

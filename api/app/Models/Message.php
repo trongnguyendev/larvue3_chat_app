@@ -28,9 +28,14 @@ class Message extends Model
 
     }
 
-    public static function get_messages_by_group_id($group_id)
-    {
-        return self::where('group_id', '=', $group_id)->get();
+    public static function get_messages_by_group_id($group_id, $fromId = 0)
+    {   
+        if($fromId > 0) {
+            return self::where('group_id', '=', $group_id)->where('id', '<', $fromId)->limit(20)->orderBy('created_at', 'DESC')->get();
+        }
+
+        return self::where('group_id', '=', $group_id)->limit(20)->orderBy('created_at', 'DESC')->get();
+        
     }
 
 }

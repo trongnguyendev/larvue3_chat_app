@@ -8,6 +8,7 @@ use App\Models\Participant;
 use App\Models\User;
 use App\Models\Message;
 use Illuminate\Support\Facades\DB;
+use App\Events\PrivateMessageEvent;
 
 class ConversationController extends Controller
 {

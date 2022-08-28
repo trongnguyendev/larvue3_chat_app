@@ -12,6 +12,8 @@
         placeholder="Aa" 
         v-model="inputMessage" 
         @keyup.enter="sendMessage"
+        @input="changeValue()"
+        ref="refMessage"
         class="input input-ghost w-full bg-opacity-20 bg-transparent h-8 focus:outline-none focus:bg-opacity-20 px-2 py-4">
     </div>
 </template>
@@ -26,6 +28,11 @@ let emojiIndex = new EmojiIndex(data);
 import { EmojiHappyIcon } from '@heroicons/vue/solid'
 
 export default {
+    props: {
+        modelValue: String
+    },
+    emits: ['update:modelValue'],
+
     components: {
         Picker,
         EmojiHappyIcon
@@ -38,15 +45,14 @@ export default {
     },
     methods: {
         showEmoji(emoji) {
-            console.log(emoji)
             this.inputMessage += emoji.native;
-            console.log(this.inputMessage)
         },
         sendMessage() {
-            console.log(this.inputMessage)
-            this.$emit('someEvent', this.inputMessage)
+            this.$emit('emitMessage', this.inputMessage)
             this.inputMessage = ''
-            
+        },
+        changeValue() {
+            this.$emit('update:modelValue', this.$refs.refMessage.value);
         }
     }
 }

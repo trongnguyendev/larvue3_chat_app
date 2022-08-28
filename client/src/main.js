@@ -42,24 +42,10 @@ const timeagoOptions = {
         locale: 'vn'
 
     }
-  }  
-// socket
-import Echo from 'laravel-echo';
+}
 
-window.Pusher = require('pusher-js');
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: process.env.VUE_APP_WEBSOCKETS_KEY,
-    wsHost: process.env.VUE_APP_WEBSOCKETS_SERVER,
-    wsPort: 6001,
-    forceTLS: false,
-    disableStats: true
-});
-
-// import VueSocketIO from 'vue-3-socket.io'
-// import SocketIo from 'socket.io-client'
-
+// socket.io 
+import io from "socket.io-client"
   
 // register componenet global
 import ErrorMessage from '@/components/base/ErrorMessage'
@@ -77,6 +63,7 @@ app.use(store)
 app.use(i18n)
 app.use(VueCookies, globalCookiesConfig)
 app.use(timeago, timeagoOptions)
+app.config.globalProperties.$socketio = io('http://192.168.1.86:6002')
 
 app.mount('#app')
 
