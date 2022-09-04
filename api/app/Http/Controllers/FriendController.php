@@ -177,6 +177,23 @@ class FriendController extends Controller
         return $this->response_json(1, 'list friend', [ 'relationships' => $res ]);
     }
 
+    public function get_last_message_by_group_name(Request $request)
+    {
+        $data = $request->rooms;
+
+        $groups = DB::table('group_chats')
+                    ->join('messages', 'messages.group_id', '=', 'group_chats.id')
+                    ->whereIn('group_chats.name', $data)
+                    ->select('group_chats.id as group_chat_id', 'group_chats.name', 'messages.id as message_id', 'messages.message_type', 'messages.content', 'messages.created_at', 'messages.updated_at')
+                    ->orderBy('group_chat_id', 'DESC')
+                    ->orderBy('messages.created_at', 'DESC')
+                    ->get()
+                    ->unique('group_chat_id');
+
+        return $this->response_json(1, 'message last groups', [ 'message_last_groups' => $groups ]);
+
+    }
+
     public function update_relationship_by_status(Request $request)
     {
         $friend_id = $request->friend_id;
@@ -215,7 +232,10 @@ class FriendController extends Controller
             // create group messenger
             if($status == static::$accepted) {
 
+                $name_group = (auth()->id() > $friend_id) ? (auth()->id() . '_'. $friend_id .'_room') : ($friend_id . '_'. auth()->id() .'_room');
+
                 $data_group = [
+                    'name'      => $name_group,
                     'user_1_id' => auth()->id(),
                     'user_2_id' => $friend_id,
                 ];

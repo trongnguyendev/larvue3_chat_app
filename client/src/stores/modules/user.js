@@ -5,7 +5,10 @@ const isToken = JSON.parse(localStorage.getItem('user'));
 const initialState = {
     user: [],
     profile: [],
-    friends_current: []
+    friends_current: [],
+    rooms: [],
+    room_current: null,
+    room_notify: [],
 }
 
 export default {
@@ -17,7 +20,20 @@ export default {
             return state.user
         },
         friends_current(state) {
-            return state.friends_current
+            let friends_room = [];
+            state.friends_current.forEach((friend, index) => {
+                let room = (friend.user_1_id > friend.user_2_id) ? (friend.user_1_id + "_" + friend.user_2_id + "_room") : (friend.user_2_id + "_" + friend.user_1_id + "_room"); 
+                friend.room = room;
+
+                friends_room.push(friend)
+            });
+            return friends_room;
+        },
+        room_current(state) {
+            return state.room_current
+        },
+        room_notify(state) {
+            return state.room_notify;
         }
     },
 
@@ -31,7 +47,56 @@ export default {
         },
         ['SET_FRIEND'](state, data) {
             state.friends_current = data
+        },
+        ['RESET_INFOR'](state, data) {
+            state.user = [],
+            state.profile = [],
+            state.friends_current = [],
+            state.room_current = null,
+            state.room_notify = []
+        },
+        ['SET_ROOM_CURRENT'](state, data) {
+            state.room_current = data;
+        },
+        ['SET_ROOM_NOTIFY'](state, data) {
+            if(!state.room_notify.includes(data)) {
+                state.room_notify.push(data);
+            }
+        },
+        ['REMOVE_ROOM_NOTIFY'](state, data) {
+            let room_index = state.room_notify.indexOf(data);
+            if(room_index >= 0) {
+                state.room_notify.splice(room_index, 1)
+            }
+            
+        },
+        ['SET_MESSAGE_NOTIFY'](state, data) {
+            state.friends_current.forEach((friend, index) => {
+                if(friend.room == data.room) {
+                    friend.last_message = data.message.content
+                } 
+            })
+        },
+        ['SET_LAST_MESSAGE'](state, dataLastMessage) {
+            state.friends_current.forEach((friend, index) => {
+                let dataRoomFriend = dataLastMessage[friend.room];
+                if(dataRoomFriend) {
+                    friend.last_message = dataRoomFriend.content
+                    friend.created_at = dataLastMessage[friend.room].created_at
+                }
+                
+                
+            })
+        },
+        ['SET_LAST_MESSAGE_BY_ROOM'](state, dataLastMessage) {
+            state.friends_current.forEach((friend, index) => {
+                if(friend.room == dataLastMessage.room) {
+                    friend.last_message = dataLastMessage.content
+                    friend.created_at = dataLastMessage.created_at
+                }
+            })
         }
+
     },
 
     actions: {
@@ -90,7 +155,6 @@ export default {
 
         updateRelationshipByStatus({ commit }, data) {
             return new Promise((resolve, reject) => {
-                console.log(data.status)
                 UserService.updateRelationshipByStatus(data)
                 .then((response) => {
                     resolve(response)
@@ -100,6 +164,19 @@ export default {
                 })
             })
         },
+
+        getLastMessageByGroupName({ commit }, data) {
+            
+            return new Promise((resolve, reject) => {
+                UserService.getLastMessageByGroupName(data)
+                .then((response) => {
+                    resolve(response)
+                })
+                .catch((err) => {
+                    reject (err)
+                })
+            })
+        }
         
 
 

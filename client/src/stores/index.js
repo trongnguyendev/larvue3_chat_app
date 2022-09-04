@@ -4,7 +4,9 @@ import * as types from './mutation-types'
 import auth from './modules/auth';
 import notification from './modules/notification';
 import user from './modules/user';
-import messageUser from './modules/messageUser';
+import messageUser from './modules/messageUser'; 
+
+import { webSocketServer } from '@/config/socket';
 
 const store = createStore({
     modules: {
@@ -33,6 +35,8 @@ const store = createStore({
         commit('SET_DARK', dark)
       },
     },
+
+    plugins: [webSocketServer],
 })
 
 

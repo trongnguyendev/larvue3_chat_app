@@ -137,3 +137,18 @@ background: linear-gradient(to right, #2c3e50, #2980b9); /* W3C, IE 10+/ Edge, F
   }
 
 
+.message_notify {
+  position: relative;
+  background: #eee;
+}
+
+.message_notify::before {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #63beff;
+  right: 11px;
+  border-radius: 100%;
+  bottom: 13px;
+  content: '';
+}

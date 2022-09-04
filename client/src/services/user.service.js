@@ -56,6 +56,23 @@ class UserService {
             console.log(err)
         })
     }
+
+    getLastMessageByGroupName(data) {
+        return axios.post(API_URL + 'get_last_message_by_group_name', data)
+        .then(response => {
+            let messages = [];
+            
+            Object.entries(response.data.results.message_last_groups).forEach((message, index) => {
+                messages[message[1].name] = message[1]
+            })
+
+            response.data.results.message_last_groups = messages;
+            return response.data
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
 }
 
 export default new UserService();

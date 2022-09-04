@@ -1,63 +1,75 @@
-// var io = require('socket.io')(6001)
-
-// console.log("connected to port 6001")
-
-// io.on('error', function() {
-//     console.log("error")
-// })
-
-// io.on('connection', function(socket) {
-//     console.log("User connect " + socket.id)
-// })
-
-// var Redis = require('ioredis')
-// var redis = new Redis(6379)
-// redis.psubscribe("*", function(error, count) {
-
-// })
-
-
-
-// var app = require('express')();
-
-// var http = require('http').Server(app);
-
-// var io = require('socket.io')(http);
-
-// var Redis = require('ioredis');
-
-// var redis = new Redis();
-
-// io.on('connection', function(socket) {
-//     console.log("User connect " + socket.id)
-// })
-
-
-// redis.subscribe('test-channel', function(err, count) {
-// });
-
-// redis.on('message', function(channel, message) {
-//     console.log('Message Recieved: ' + message);
-//     message = JSON.parse(message);
-//     io.emit(channel + ':' + message.event, message.data);
-// });
-
-// http.listen(3000, function(){
-//     console.log('Listening on Port 3000');
-// });
-
 const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
-
-
-io.on('connection', (socket) => {
-    console.log('a user connected');
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:8082"
+  }
 });
 
-server.listen(3000, () => {
-    console.log('listening on *:3000');
+const list_room = ['5_3_room', '4_3_room', '3_2_room'];
+
+
+const Redis = require('ioredis');
+const { parse } = require('path');
+const { SocketAddress } = require('net');
+const redis = new Redis();
+var users = [];
+
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
+// Broadcast redis
+redis.subscribe('private-channel', function() {
+  console.log("redis listen");
+});
+
+redis.on('message', function(channel, data) {
+  if(channel == 'private-channel') {
+    let room = JSON.parse(data).data.data.room;
+    let message = JSON.parse(data).data.data.message;
+    io.sockets.emit('chat message', { message: message, room: room });
+  }
+  
+})
+let roomno = 1;
+io.on('connection', (socket) => {
+  // inital join room
+  socket.on('initial_join_room', (rooms) => {    
+    rooms.forEach((room, index) => {
+      socket.join(room);
+    })
+  
+  })
+
+  // initial socket
+  let room_chat = null;
+
+  socket.on('initial_socket', async (room_chat) => {
+    socket.in(room_chat).emit('connectToRoom', room_chat);   
+  })
+
+  // disconnect socket
+  socket.on('disconnect', () => {
+  })
+
+  // event chat message
+  socket.on('chat message', (msg) => {
+    socket.emit('chat message', msg);
+  })
+
+  socket.on('typing', (data) => {
+    socket.to(data.room).emit('typing', data);
+  })
+
+  socket.on('topTyping', (data) => {
+  })
+
+});
+
+server.listen(6002, () => {
+  console.log('listening on *:6002');
 });
