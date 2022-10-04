@@ -8,6 +8,12 @@ use App\Models\Friend;
 use App\Models\User;
 use App\Models\Relationship;
 use App\Models\GroupChat;
+use App\Models\UserProfile;
+use App\Models\Notification;
+use App\Models\Message;
+use App\Events\RequestFriendEvent;
+use App\Events\PrivateMessageEvent;
+use Auth;
 
 class FriendController extends Controller
 {
@@ -129,22 +135,50 @@ class FriendController extends Controller
         })
         ->whereIn('status', [static::$requested, static::$accepted, static::$cancel])
         ->first();
-        // return $this->response_json(1, 'Exist relationship', ['relationship' => $exist_relationship]); die();
+        
+        $profile = UserProfile::where('user_id', '=', auth()->id())->first();
 
         if(!empty($exist_relationship)) {
-            $relationship_update = Relationship::find($exist_relationship->id);
-            $relationship_update->status = '1';
-            $relationship_update->save();
-            return $this->response_json(1, 'Exist relationship', ['relationship' => $relationship_update]);
-        }   
-        
-        $relationship = Relationship::create([
-            'status'    => static::$requested,
-            'user_1_id' => auth()->id(),
-            'user_2_id' => $friend_id
-        ]);
+            $relationship = Relationship::find($exist_relationship->id);
+            $relationship->status = '1';
+            $relationship->save();
 
-        return $this->response_json(1, 'New relationship', ['relationship'  => $relationship]);
+            $data_socket_friend = [
+                'type' => 'request',
+                'result'    =>  [
+                    'user' => auth()->user(),
+                    'profile' => $profile
+                ],
+                'room'      => $friend_id . "_room",
+            ];
+        }
+        else {
+            $relationship = Relationship::create([
+                'status'    => static::$requested,
+                'user_1_id' => auth()->id(),
+                'user_2_id' => $friend_id,
+            ]);
+    
+            $data_socket_friend = [
+                'type' => 'request',
+                'result'    =>  [
+                    'user' => auth()->user(),
+                    'profile' => $profile,
+
+                ],
+                'room'      => $friend_id . "_room",
+            ];
+        }
+
+        if($relationship) {
+
+            event(new RequestFriendEvent($data_socket_friend));
+
+            return $this->response_json(1, 'New relationship', [
+                'relationship'  => $relationship,
+            ]);
+        }
+        
     }
 
     public function get_relationships_by_status(Request $request)
@@ -170,9 +204,9 @@ class FriendController extends Controller
             ->where('relationships.user_1_id', '=', $id)
             ->orWhere('relationships.user_2_id', '=', $id);
         })
-        ->where('relationships.status', $status)
-        ->select('*')
-        ->get();
+        ->where('relationships.status', '=', (string) $status)
+        ->select('user_profiles.avatar', 'relationships.id as relationship_id', 'users.name', 'relationships.status', 'relationships.user_1_id', 'relationships.user_2_id', 'user_profiles.user_id')
+        ->get();        
         
         return $this->response_json(1, 'list friend', [ 'relationships' => $res ]);
     }
@@ -205,6 +239,10 @@ class FriendController extends Controller
             'friend_id' => $friend_id
         ]);
 
+        // infor friend
+        $friend = User::find($friend_id);
+        $profile = UserProfile::where('user_id', '=', $friend_id)->first();
+
         if(!in_array($status, [static::$requested, static::$accepted, static::$cancel])) {
             return $this->response_json(0, 'data fail', []);
         }
@@ -228,6 +266,25 @@ class FriendController extends Controller
             ]
         );
 
+        //delete
+        if($status == 3 || $status == 0) {
+            $relationship->delete();
+            Message::where('group_id', '=', $group_exist['id'])->delete();
+            $group_exist->delete();
+        }
+
+        $data_socket_friend = [
+            'type' => 'accept',
+            'result'    =>  [
+                'user' => auth()->user(),
+                'profile' => $profile,
+
+            ],
+            'room'      => $friend_id . "_room",
+        ];
+
+        event(new RequestFriendEvent($data_socket_friend));
+
         if($relationship_update && empty($group_exist)) {
             // create group messenger
             if($status == static::$accepted) {
@@ -242,14 +299,14 @@ class FriendController extends Controller
 
                 $group = GroupChat::create($data_group);
 
-                return $this->response_json(1, 'update status accept and create group.', ['group' => $group]);
+                return $this->response_json(1, 'update status accept and create group.', ['group' => $group, 'friend_infor' => $friend, 'profile' => $profile]);
 
             }
 
-            return $this->response_json(1, 'update status accepted success', []);
+            return $this->response_json(1, 'update status accepted success', ['friend_infor' => $friend, 'profile' => $profile]);
         }
 
-        return $this->response_json(0, 'Accept fail or Accepted', []);
+        return $this->response_json(0, 'Accept fail or Accepted', ['friend_infor' => $friend, 'profile' => $profile]);
     }
 
 }

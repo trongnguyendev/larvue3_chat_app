@@ -8,6 +8,7 @@ use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\GroupChatController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,7 +81,10 @@ Route::group([
     Route::post('get_last_message_by_group_name', [FriendController::class, 'get_last_message_by_group_name'])->name('friend.get_last_message');
 
 
-    //
+    // notification
+    Route::get('get_notification', [NotificationController::class, 'index'])->name('notification.index');
+    Route::post('create_notification', [NotificationController::class, 'create'])->name('notification.create');
+    Route::post('update_notification_by_ids', [NotificationController::class, 'setReadNotificationByNotificationIds'])->name('notification.update');
     
 });
 

@@ -48,6 +48,9 @@ export default {
         ['SET_FRIEND'](state, data) {
             state.friends_current = data
         },
+        ['PUSH_FRIEND'](state, data) {
+            state.friends_current.push(data)
+        },
         ['RESET_INFOR'](state, data) {
             state.user = [],
             state.profile = [],
@@ -84,8 +87,6 @@ export default {
                     friend.last_message = dataRoomFriend.content
                     friend.created_at = dataLastMessage[friend.room].created_at
                 }
-                
-                
             })
         },
         ['SET_LAST_MESSAGE_BY_ROOM'](state, dataLastMessage) {
@@ -165,11 +166,21 @@ export default {
             })
         },
 
-        getLastMessageByGroupName({ commit }, data) {
-            
+        getLastMessageByGroupName({ commit, state }) {
+            let rooms = [];
+
+            let friends = [...state.friends_current];
+
+            friends.forEach((friend, index) => {
+                rooms.push(friend.room)
+            })
+
             return new Promise((resolve, reject) => {
-                UserService.getLastMessageByGroupName(data)
+                UserService.getLastMessageByGroupName({'rooms': rooms})
                 .then((response) => {
+                    if(response.status == 1) {
+                        commit('SET_LAST_MESSAGE', response.results.message_last_groups)
+                    }
                     resolve(response)
                 })
                 .catch((err) => {

@@ -38,7 +38,6 @@ class UserService {
     addFriend(data) {
         return axios.post(API_URL + 'create_relationship', data)
         .then(response => {
-            console.log(response)
             return response.data
         })
         .catch(err => {
@@ -49,7 +48,6 @@ class UserService {
     updateRelationshipByStatus(data) {
         return axios.post(API_URL + 'update_relationship_by_status', data)
         .then(response => {
-            console.log(response)
             return response.data
         })
         .catch(err => {
