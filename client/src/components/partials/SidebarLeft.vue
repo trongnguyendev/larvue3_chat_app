@@ -17,7 +17,7 @@
                 <Tab>
                     <div class="w-full cursor-pointer">
                         <div class="indicator">
-                            <span class="indicator-item badge p-0 h-3 w-3 right-2 top-3 bg-blue-500 border-blue-500"></span> 
+                            <span v-if="countRequestFriend > 0" class="indicator-item badge p-0 h-4 w-4 right-2 top-3 bg-blue-500 border-blue-500">{{ countRequestFriend }}</span> 
                             <BellIcon class="w-8 h-8 m-auto text-gray-500" />
                         </div>
                     </div>
@@ -33,12 +33,16 @@
                             <CogIcon class="w-8 h-8 m-auto text-gray-500" @click="setLogout" />
                         </div>
                     </Tab>
+                    <MenuAlt3Icon class="w-8 h-8 m-auto text-gray-500 md:hidden block" @click="disableAsideMain" />
                 </div>
             </div>
             
             </TabList>
             <TabPanels>
-                <div class="aside-main w-[350px]">
+                <Transition name="asidemain">
+                <div class="aside-main md:w-[350px]" :class="[
+                    closeSideMain ? 'w-0' : 'w-[350px]'
+                ]">
                     <!-- profile panel -->
                     <TabPanel>Content 2</TabPanel>
                     <!-- chat panel -->
@@ -65,11 +69,13 @@
 
                             <div class="mt-5 h-full">
                                 <div class="px-4">
-                                    <h2 class="text-2xl font-bold text-5th">Recent</h2>
+                                    <h2 class="text-2xl font-bold text-5th">
+                                        Recent
+                                    </h2>
                                     <p class="text-sm text-5th">Start New Conversation</p>
                                 </div>
                                 
-                                    <div class="px-4 my-2">
+                                <div class="px-4 my-2">
                                     <div class="bg-gray-100 flex items-center gap-1 px-2 rounded-md ">
                                         <SearchIcon class="w-5 text-gray-500" />
                                         <input
@@ -106,11 +112,9 @@
                                             </div>
 
                                             <div class="flex gap-2"
-                                            v-else-if="friend.status == 1 && friend.user_2_id == option.id"
-                                            @click="add_relationship(friend.id, 2)"
-                                            >
-                                                <XIcon class="w-6 text-gray-500" /> 
-                                                <CheckIcon  class="w-6 text-gray-500" />
+                                            v-else-if="friend.status == 1 && friend.user_2_id == option.id">
+                                                <XIcon class="w-6 text-gray-500" @click="add_relationship(friend.id, 3)" /> 
+                                                <CheckIcon  class="w-6 text-gray-500" @click="add_relationship(friend.id, 2)" />
                                             </div>
 
                                             <div
@@ -161,10 +165,31 @@
                         </div>
                     </TabPanel>
                     <!-- notification panel -->
-                    <TabPanel>Content 3</TabPanel>
+                    <TabPanel>
+                        <div class="p-4 h-full">
+                            <h2 class="text-2xl font-bold text-5th">Request</h2>
+                            <p class="text-sm text-5th">Open a request to get info about who's messaging you. They won't know you've seen it until you reply.</p>
+                            <div class="recents_message mt-4 h-recent" v-for="(friend, index) in requestFriend" :key="index">
+                                <div class="flex gap-4 py-3 px-3 cursor-pointer ease-linear items-center rounded-lg bg-slate-200 hover:bg-slate-200">
+                                    <Avartar :name="friend.name" size="w-10" :tooltip="false" />  
+                                    <div class="w-full">
+                                        <h3 class="font-bold flex items-center justify-between text-5th text-sm">{{ friend.name }}</h3>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button class="btn btn-primary btn-xs" @click="add_relationship(friend.user_id, 2)"><CheckIcon class="w-5" /></button>
+                                        <button class="btn btn-xs" @click="add_relationship(friend.user_id, 3)"><XIcon class="w-5"/></button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </TabPanel>
                     <!-- setting panel -->
                     <TabPanel>Content 4</TabPanel>
                 </div>
+                </Transition>
+                
             </TabPanels>
         </TabGroup>
 
@@ -179,7 +204,9 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
 <script>
 import SearchIcon from '@/components/icons/Search.vue'
 import PowerOffIcon from '@/components/icons/PowerOff.vue'
-import { LogoutIcon, AnnotationIcon, CogIcon, MoonIcon, SunIcon, BellIcon, UserAddIcon, CheckIcon, XIcon } from '@heroicons/vue/outline'
+import { LogoutIcon, AnnotationIcon, CogIcon, MoonIcon, SunIcon, BellIcon, UserAddIcon, CheckIcon, XIcon, MenuAlt3Icon } from '@heroicons/vue/outline'
+
+import { DotsHorizontalIcon } from "@heroicons/vue/solid"
 
 import Avartar from '@/components/Avatar'
 // import { MoonIcon } from '@heroicons/vue/solid'
@@ -205,6 +232,7 @@ export default {
         UserAddIcon,
         CheckIcon,
         XIcon,
+        MenuAlt3Icon,
 
         Avartar
     },
@@ -237,12 +265,16 @@ export default {
             // messenger current
             friend_messenger_current: [],
 
+            closeSideMain: false,
+            
+
         }
     },
 
     computed: {
         ...mapGetters(['darkMode']),
-        ...mapGetters('user', ['friends_current', 'room_current', 'room_notify'])
+        ...mapGetters('user', ['friends_current', 'room_current', 'room_notify']),
+        ...mapGetters('relationFriend', ['requestFriend', 'countRequestFriend']),
     },
 
     watch: {
@@ -261,14 +293,15 @@ export default {
 
         ...mapActions('auth', ['logout']),
 
-        ...mapActions('user', ['findFriend', 'addFriend', 'getFriendsByStatus', 'updateRelationshipByStatus']),
+        ...mapActions('user', ['findFriend', 'addFriend', 'getFriendsByStatus', 'updateRelationshipByStatus', 'getLastMessageByGroupName']),
 
         ...mapActions('messageUser', [
             'setCurrentUserMessage',
             'getMessageByGroup',
         ]),
         ...mapMutations('messageUser', ['SET_FRIEND_MESSENGER_INFOR', 'RESET_MESSAGE_USER', 'CLEAR_MESSAGE']),
-        ...mapMutations('user', ['RESET_INFOR', 'SET_ROOM_CURRENT', 'REMOVE_ROOM_NOTIFY']),
+        ...mapMutations('user', ['RESET_INFOR', 'SET_ROOM_CURRENT', 'REMOVE_ROOM_NOTIFY', 'PUSH_FRIEND']),
+        ...mapMutations('relationFriend', ['REMOVE_REQUEST_FRIEND']),
 
         // set mode theme
         toggleDarkMode() {
@@ -380,6 +413,9 @@ export default {
                     //accept friend
                     console.log("accept friend")
                     res = await this.updateRelationshipByStatus({ friend_id: id_friend, status: STATUS_ACCEPTED})
+                    await this.getFriendsByStatus({'status': '2'});   
+                    await this.getLastMessageByGroupName();
+
                     break;
                 case 3:
                     // cancel friend / unfriend 
@@ -389,8 +425,17 @@ export default {
                 default:
                     res = await this.addFriend({ friend_id: id_friend})                    
                     break;
-            }            
+            }         
+
+            if(res) {
+                this.REMOVE_REQUEST_FRIEND(id_friend)
+            }
+
         },
+
+        disableAsideMain() {
+            this.closeSideMain = !this.closeSideMain
+        }
 
 
     }

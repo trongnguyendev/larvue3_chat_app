@@ -160,7 +160,10 @@ export default {
   async created() {
     await this.loadUser()
     await this.get_friends()
-    await this.set_last_message_for_room()
+    // await this.set_last_message_for_room()
+    await this.getLastMessageByGroupName();
+    // await this.getNotification()
+    await this.get_relationship_by_status({status : 1})
 
     this.$socketio.on('chat message', async (msg) => {
       this.socketMessageSync(msg);
@@ -217,6 +220,9 @@ export default {
       'SET_LAST_MESSAGE',
       'SET_LAST_MESSAGE_BY_ROOM',
     ]),
+    ...mapActions('relationFriend', [
+      'get_relationship_by_status'
+    ]),
 
     async loadUser() {
       let response = await this.getInforMe()
@@ -236,20 +242,22 @@ export default {
         let res = await this.getFriendsByStatus({'status': '2'});   
     }, 
 
-    async set_last_message_for_room() {
-      let rooms = []
+    // async set_last_message_for_room() {
+      // let rooms = []
 
-      this.friends_current.forEach((friend, index) => {
-        rooms.push(friend.room)
-      })
+      // this.friends_current.forEach((friend, index) => {
+      //   rooms.push(friend.room)
+      // })
 
-      let res = await this.getLastMessageByGroupName({'rooms': rooms});
+      // let res = await this.getLastMessageByGroupName({'rooms': rooms});
 
-      if(res.status == 1) {
-        this.SET_LAST_MESSAGE(res.results.message_last_groups)
-      }
+      // if(res.status == 1) {
+      //   this.SET_LAST_MESSAGE(res.results.message_last_groups)
+      // }
+
+      // await this.getLastMessageByGroupName();
       
-    },
+    // },
 
     async sentMessage(content) {
 
@@ -305,7 +313,6 @@ export default {
 
       if(this.isScrollLoadMessage) {
         let message_id = this.$refs[`message_${this.lastIdMessageOld}`]
-        // console.log(message_id[0].scrollHeight)
         container.scrollTop = container.scrollHeight / 4
         this.isScrollLoadMessage = false
       }

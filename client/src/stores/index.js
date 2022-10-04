@@ -5,6 +5,7 @@ import auth from './modules/auth';
 import notification from './modules/notification';
 import user from './modules/user';
 import messageUser from './modules/messageUser'; 
+import relationFriend from './modules/relationFriend';
 
 import { webSocketServer } from '@/config/socket';
 
@@ -13,7 +14,8 @@ const store = createStore({
       auth,
       notification,
       user,
-      messageUser
+      messageUser,
+      relationFriend,
     },
 
     state: {

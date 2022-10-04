@@ -26,16 +26,37 @@ app.get('/', (req, res) => {
 redis.subscribe('private-channel', function() {
   console.log("redis listen");
 });
+redis.subscribe('request-channel', function() {
+  console.log("request channel listen");
+})
 
 redis.on('message', function(channel, data) {
+
+  let dataRedis = JSON.parse(data).data.data;
+
+  // sent message
   if(channel == 'private-channel') {
-    let room = JSON.parse(data).data.data.room;
-    let message = JSON.parse(data).data.data.message;
+    let room = dataRedis.room;
+    let message = dataRedis.message;
     io.sockets.emit('chat message', { message: message, room: room });
+  }
+
+  // request friend
+  if(channel === 'request-channel') {
+    
+    let room = dataRedis.room;
+    console.log("room: " + room);
+    console.log(dataRedis);
+    if(dataRedis.type == 'request') {
+      io.sockets.to(room).emit('request friend', { dataRedis});
+    }
+
+    if(dataRedis.type == 'accept') {
+      io.sockets.to(room).emit('accept friend', { dataRedis});
+    }
   }
   
 })
-let roomno = 1;
 io.on('connection', (socket) => {
   // inital join room
   socket.on('initial_join_room', (rooms) => {    
