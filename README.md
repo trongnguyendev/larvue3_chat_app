@@ -1,26 +1,11 @@
-# Project Name
-> Outline a brief description of your project.
-> Live demo [_here_](https://www.example.com). <!-- If you have the project hosted somewhere, include the link here. -->
+# Chat application
 
-## Table of Contents
-* [General Info](#general-information)
-* [Technologies Used](#technologies-used)
-* [Features](#features)
-* [Screenshots](#screenshots)
-* [Setup](#setup)
-* [Usage](#usage)
-* [Project Status](#project-status)
-* [Room for Improvement](#room-for-improvement)
-* [Acknowledgements](#acknowledgements)
-* [Contact](#contact)
-<!-- * [License](#license) -->
 
 
 ## General Information
-- Provide general information about your project here.
-- What problem does it (intend to) solve?
-- What is the purpose of your project?
-- Why did you undertake it?
+- Create conversation with friend.
+- Interact by send message, icon, image.
+- Can chat video call, voice call together.
 <!-- You don't have to answer all the questions - just the ones relevant to your project. -->
 
 
@@ -42,48 +27,34 @@ List the features is buidling:
 
 
 ## Screenshots
-![Example screenshot](./![screen_shoot_chat_app](https://user-images.githubusercontent.com/55015487/194898106-6cfb7a98-7da2-43d8-be75-ff594482df52.png))
+![Example screenshot](./screen_shoot_chat_app.png)
 <!-- If you have screenshots you'd like to share, include them here. -->
 
 
 ## Setup
-What are the project requirements/dependencies? Where are they listed? A requirements.txt or a Pipfile.lock file perhaps? Where is it located?
+1. Clone project.
+2. Run API:
+  - Install redis: composer require predis/predis
+  - Start redis.
+  - Composer install.
+  - Config file .env .
+  - Start api: php artisan serve.
+  - Start queue worker: php artisan queue:work.
+  - Start server socket: cd api/socket_server => node server.js <br>
+  (I use laradock to start redis and this project https://laradock.io/)
+3. Run client (Vuejs)
+  - cd client.
+  - npm install.
+  - npm run serve.
 
-Proceed to describe how to install / setup one's local environment / get started with the project.
 
-
-## Usage
-How does one go about using it?
-Provide various use cases and code examples here.
 
 `write-your-code-here`
 
 
 ## Project Status
-Project is: _in progress_ / _complete_ / _no longer being worked on_. If you are no longer working on it, provide reasons why.
+Project is: _in progress
 
-
-## Room for Improvement
-Include areas you believe need improvement / could be improved. Also add TODOs for future development.
-
-Room for improvement:
-- Improvement to be done 1
-- Improvement to be done 2
-
-To do:
-- Feature to be added 1
-- Feature to be added 2
-
-
-## Acknowledgements
-Give credit here.
-- This project was inspired by...
-- This project was based on [this tutorial](https://www.example.com).
-- Many thanks to...
-
-
-## Contact
-Created by [@flynerdpl](https://www.flynerd.pl/) - feel free to contact me!
 
 
 <!-- Optional -->
