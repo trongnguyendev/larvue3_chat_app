@@ -25,20 +25,24 @@
 
 
 ## Technologies Used
-- Tech 1 - version 1.0
-- Tech 2 - version 2.0
-- Tech 3 - version 3.0
+- Backend: Laravel8, Mysql,SocketIo, Redis, Jwt.
+- Frontend: Vue3, TailwindCss, ...
 
 
 ## Features
 List the ready features here:
-- Awesome feature 1
-- Awesome feature 2
-- Awesome feature 3
+- Send message with friend.
+- Find friend.
+- Request/Accept friend.
+
+List the features is buidling:
+- Chat video call, voice call.
+- Add/Update Profile.
+- Setup theme, background UI.
 
 
 ## Screenshots
-![Example screenshot](./img/screenshot.png)
+![Example screenshot](./![screen_shoot_chat_app](https://user-images.githubusercontent.com/55015487/194898106-6cfb7a98-7da2-43d8-be75-ff594482df52.png))
 <!-- If you have screenshots you'd like to share, include them here. -->
 
 
