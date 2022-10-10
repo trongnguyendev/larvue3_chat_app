@@ -25,12 +25,6 @@ List the features is buidling:
 - Add/Update Profile.
 - Setup theme, background UI.
 
-
-## Screenshots
-![Example screenshot](./screen_shoot_chat_app.png)
-<!-- If you have screenshots you'd like to share, include them here. -->
-
-
 ## Setup
 1. Clone project.
 2. Run API:
@@ -54,6 +48,11 @@ List the features is buidling:
 
 ## Project Status
 Project is: _in progress
+
+## Screenshots
+![Example screenshot](./screen_shoot_chat_app.png)
+<!-- If you have screenshots you'd like to share, include them here. -->
+
 
 
 
