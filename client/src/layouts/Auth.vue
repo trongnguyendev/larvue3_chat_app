@@ -3,6 +3,7 @@
         <div class="auth w-96 rounded-md overflow-hidden">
             <router-view></router-view>
             .âsasasas
+            sdsdsd
         </div>
     </div>
 </template>
