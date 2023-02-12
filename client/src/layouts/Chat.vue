@@ -5,7 +5,7 @@
         <SidebarLeft :option="sidebar_option" @chosen-friend="chosenFriend" />
 
         <!-- main -->
-        aaaooooo9999
+        aaaooooo9999000
         <div id="content" class="w-full relative" v-if="Object.keys(friendInfor).length > 0">
             <div class="absolute w-full left-0 top-0 p-4 z-10 bg-3rd">
                 <div class="bg-4th h-20 p-4 flex justify-between items-center rounded-sm shadow-sm">
