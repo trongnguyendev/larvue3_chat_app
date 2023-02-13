@@ -8,6 +8,7 @@
         aaaooooo99990001111
         ooooo
         ádasd
+        113
         <div id="content" class="w-full relative" v-if="Object.keys(friendInfor).length > 0">
             <div class="absolute w-full left-0 top-0 p-4 z-10 bg-3rd">
                 <div class="bg-4th h-20 p-4 flex justify-between items-center rounded-sm shadow-sm">
